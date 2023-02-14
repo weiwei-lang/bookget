@@ -48,6 +48,22 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		return
 	}
 
+	text := `{
+    "Image": {
+    "xmlns":    "http://schemas.microsoft.com/deepzoom/2009",
+    "Url":      "%s",
+    "Format":   "%s",
+    "Overlap":  "1", 
+	"MaxLevel": "0",
+	"Separator": "/",
+        "TileSize": "%d",
+        "Size": {
+            "Height": "%d",
+            "Width":  "%d"
+        }
+    }
+}
+`
 	dziUrls := make([]string, 0, len(tiles))
 	for key, item := range tiles {
 		i, _ := strconv.Atoi(key)
@@ -59,23 +75,6 @@ func Download(dt *DownloadTask) (msg string, err error) {
 			continue
 		}
 		serverUrl := fmt.Sprintf("http://guji.sclib.org/medias/%s/tiles/%s/", dt.BookId, key)
-
-		text := `{
-    "Image": {
-        "xmlns":    "http://schemas.microsoft.com/deepzoom/2008",
-	"Url":      "%s",
-        "Format":   "%s", 
-        "Overlap":  "1", 
-	"MaxLevel": "0",
-	"Separator": "/",
-        "TileSize": "%d",
-        "Size": {
-            "Height": "%d",
-            "Width":  "%d"
-        }
-    }
-}
-`
 		txt := fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
 		log.Printf("Create a new file %s \n", sortId)
 		util2.FileWrite([]byte(txt), dest)
@@ -89,7 +88,11 @@ func Download(dt *DownloadTask) (msg string, err error) {
 func getBookId(text string) string {
 	sUrl := strings.ToLower(text)
 	bookId := ""
-	m := regexp.MustCompile(`id=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	m := regexp.MustCompile(`bookId=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	if m != nil {
+		return m[1]
+	}
+	m = regexp.MustCompile(`id=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
 	if m != nil {
 		bookId = m[1]
 	}
