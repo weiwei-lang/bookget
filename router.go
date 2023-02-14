@@ -9,6 +9,7 @@ import (
 	"bookget/site/China/nlc"
 	"bookget/site/China/npmtw"
 	"bookget/site/China/rbkdocnpmtw"
+	"bookget/site/China/sclib"
 	"bookget/site/China/szlib"
 	"bookget/site/China/twnlc"
 	"bookget/site/China/usthk"
@@ -305,6 +306,13 @@ func RegisterCommand() (err error) {
 	err = Site.RegisterCommand("idp.bbaw.de", idp.Init)
 	err = Site.RegisterCommand("idp.bnf.fr", idp.Init)
 	err = Site.RegisterCommand("idp.korea.ac.kr", idp.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//037.四川省图书馆-古籍
+	err = Site.RegisterCommand("guji.sclib.org", sclib.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

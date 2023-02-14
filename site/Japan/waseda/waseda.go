@@ -11,7 +11,7 @@ import (
 	"sort"
 )
 
-// 自定义一个类型
+// 自定义一个排序类型
 type strs []string
 
 func (s strs) Len() int           { return len(s) }

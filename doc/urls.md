@@ -109,7 +109,7 @@ https://dl.ndl.go.jp/info:ndljp/pid/8929985
 ```
 
 
-9.  中国台北图书馆古典与特藏文献 –（白天很慢，可夜间或清晨下载）
+9.  中国台北古籍与特藏文献 –（白天很慢，可夜间或清晨下载）
 ```
 https://rbook.ncl.edu.tw/NCLSearch/Search/SearchDetail?item=422a7598bd0046aebf2684ae0f945d25fDcyODIz0&image=1&page=&whereString=&sourceWhereString=&SourceID=
 ```
@@ -268,4 +268,11 @@ http://gzdd.gzlib.gov.cn/Hrcanton/Search/ResultSummary?bookid=GZDD022601004&file
     注：需先搜索关键词，例如`8210`，并且URL中含有`uid=xxxx`，短时间内有效，请在搜索结果后尽快下载。
 ```
 http://idp.nlc.cn/database/oo_scroll_h.a4d?uid=47355195088;recnum=0;index=2
+```
+
+36. [中国四川省图书馆-古籍](http://guji.sclib.org/qt-zxsk.html)  
+    注：需配合本人(zhudw) 修改的 dezoomify-rs 才可以下载。
+```
+http://guji.sclib.org/qt-tsxq.html?id=52
+http://guji.sclib.org/viewer.html?bookId=52#page=18&viewer=picture
 ```

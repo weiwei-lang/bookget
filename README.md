@@ -9,7 +9,7 @@ bookget 数字图书馆下载工具
 ### 支持的数字图书馆：
 1. [中国国家图书馆](http://read.nlc.cn/thematDataSearch/toGujiIndex)
 2. [哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)
-3. [中国台北图书馆](http://rbook.ncl.edu.tw/)
+3. [中国台北古籍文献](http://rbook.ncl.edu.tw/)
 4. [hathitrust数字图书馆](https://www.hathitrust.org/)
 5. [普林斯顿大学图书馆](https://library.princeton.edu/)
 6. [日本京都大学图书馆](https://rmda.kulib.kyoto-u.ac.jp/)
@@ -44,6 +44,7 @@ bookget 数字图书馆下载工具
     [familysearch.org 家譜圖像](https://www.familysearch.org/records/images/)
 34. [中国广东省广州大典](http://gzdd.gzlib.gov.cn/Hrcanton/)
 35. [國際敦煌項目](http://idp.nlc.cn/)
+36. [中国四川省图书馆-古籍](http://guji.sclib.org/qt-zxsk.html)
 
 ## 用户手册
 请参见以下文档：
