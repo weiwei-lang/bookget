@@ -66,7 +66,8 @@ func Download(dt *DownloadTask) (msg string, err error) {
 `
 	dziUrls := make([]string, 0, len(tiles))
 	for key, item := range tiles {
-		i, _ := strconv.Atoi(key)
+		k := regexp.MustCompile(`(\d+)`).FindString(key)
+		i, _ := strconv.Atoi(k)
 		sortId := fmt.Sprintf("%s.json", util2.GenNumberSorted(i))
 		dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 		//文件存在，跳过
