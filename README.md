@@ -1,5 +1,7 @@
 # bookget
 
+<a href="https://github.com/deweizhu/bookget/actions/workflows/go.yml"><img src="https://github.com/deweizhu/bookget/actions/workflows/go.yml/badge.svg" alt="Go build Status"></a>
+
 bookget 数字图书馆下载工具   
 
 鸣谢：
