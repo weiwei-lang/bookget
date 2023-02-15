@@ -2,6 +2,7 @@
 package converter
 
 import (
+	"github.com/mattn/go-runewidth"
 	"reflect"
 	"strconv"
 	"strings"
