@@ -1,7 +1,7 @@
 package cachepool
 
 import (
-	"onesync/lib/converter"
+	"bookget/lib/converter"
 	"runtime"
 	"sync"
 )
