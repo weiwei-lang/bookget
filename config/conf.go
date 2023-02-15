@@ -47,7 +47,7 @@ func Init(ctx context.Context) bool {
 	flag.IntVar(&Conf.MergePDFs, "mp", 0, "合并PDF文件下载，可选值[0|1]。0=否，1=是。仅对 rbk-doc.npm.edu.tw 有效。")
 	flag.IntVar(&Conf.UseCDN, "cdn", 0, "使用CDN加速，可选值[0|1]。0=否，1=是。仅对 www.loc.gov 有效。")
 	flag.StringVar(&Conf.CookieFile, "c", "", "指定cookie.txt文件路径")
-	flag.StringVar(&Conf.FileExt, "ext", "", "指定文件扩展名[.jpg|.tif|.png]等")
+	flag.StringVar(&Conf.FileExt, "ext", ".jpg", "指定文件扩展名[.jpg|.tif|.png]等")
 	c := uint(runtime.NumCPU() * 2)
 	flag.UintVar(&Conf.Threads, "n", c, "最大并发连接数")
 	flag.IntVar(&Conf.AutoDetect, "a", 0, "自动检测下载URL。可选值[0|1|2]，;0=默认;\n1=通用批量下载（类似IDM、迅雷）;\n2= IIIF manifest.json 自动检测下载图片")

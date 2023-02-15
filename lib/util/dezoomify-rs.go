@@ -31,7 +31,7 @@ func osWin(destPath string, iiifUrls []string, header map[string]string) {
 	for k, v := range iiifUrls {
 		sortId := GenNumberSorted(k + 1)
 		iifUrl := strings.Replace(v, "%", "%%", -1)
-		text += fmt.Sprintf("%s -l --compression 0 %s \"%s\" %s.jpg\r\n", config.Conf.DezoomifyRs, cookie, iifUrl, sortId)
+		text += fmt.Sprintf("%s -l --compression 0 %s \"%s\" %s%s\r\n", config.Conf.DezoomifyRs, cookie, iifUrl, sortId, config.Conf.FileExt)
 		//cookie, iifUrl, sortId
 	}
 	text += "\r\n:pause"
@@ -54,7 +54,7 @@ func osLinux(destPath string, iiifUrls []string, header map[string]string) {
 	for k, v := range iiifUrls {
 		sortId := GenNumberSorted(k + 1)
 		iifUrl := strings.Replace(v, "%", "%%", -1)
-		text += fmt.Sprintf("%s -l --compression 0 %s \"%s\" %s.jpg\n", config.Conf.DezoomifyRs, cookie, iifUrl, sortId)
+		text += fmt.Sprintf("%s -l --compression 0 %s \"%s\" %s%s\n", config.Conf.DezoomifyRs, cookie, iifUrl, sortId, config.Conf.FileExt)
 	}
 
 	text += "\n"
