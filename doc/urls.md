@@ -277,7 +277,7 @@ http://guji.sclib.org/qt-tsxq.html?id=52
 http://guji.sclib.org/viewer.html?bookId=52#page=18&viewer=picture
 ```
 
-37. [中国云南古籍数字图书馆](http://msq.ynlib.cn/)
+37. [中国云南古籍数字图书馆](http://msq.ynlib.cn/)   
     注：需配合本人(zhudw) 修改的 dezoomify-rs 才可以下载。
 ```
 http://msq.ynlib.cn/#/details/?id=1001
