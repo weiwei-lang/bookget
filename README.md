@@ -47,6 +47,7 @@ bookget 数字图书馆下载工具
 34. [中国广东省广州大典](http://gzdd.gzlib.gov.cn/Hrcanton/)
 35. [國際敦煌項目](http://idp.nlc.cn/)
 36. [中国四川省图书馆-古籍](http://guji.sclib.org/qt-zxsk.html)
+37. [中国云南古籍数字图书馆](http://msq.ynlib.cn/)
 
 ## 用户手册
 请参见以下文档：

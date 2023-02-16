@@ -276,3 +276,10 @@ http://idp.nlc.cn/database/oo_scroll_h.a4d?uid=47355195088;recnum=0;index=2
 http://guji.sclib.org/qt-tsxq.html?id=52
 http://guji.sclib.org/viewer.html?bookId=52#page=18&viewer=picture
 ```
+
+37. [中国云南古籍数字图书馆](http://msq.ynlib.cn/)
+    注：需配合本人(zhudw) 修改的 dezoomify-rs 才可以下载。
+```
+http://msq.ynlib.cn/#/details/?id=1001
+http://msq.ynlib.cn/frontend/viewer.html?typeId=80&bookId=1001#/page=1&viewer=picture
+```

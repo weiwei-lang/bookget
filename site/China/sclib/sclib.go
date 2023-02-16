@@ -42,7 +42,16 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	name := util2.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
 
-	tiles, err := getCanvases(dt.BookId, config.Conf.CookieFile)
+	//apiServer
+	var apiServer string
+	u := dt.UrlParsed
+	if u.Host == "msq.ynlib.cn" {
+		apiServer = fmt.Sprintf("%s://%s/medias2022/%s", u.Scheme, u.Host, dt.BookId)
+	} else {
+		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, dt.BookId)
+	}
+
+	tiles, err := getCanvases(dt.BookId, config.Conf.CookieFile, apiServer)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -75,7 +84,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		if err == nil && fi.Size() > 0 {
 			continue
 		}
-		serverUrl := fmt.Sprintf("http://guji.sclib.org/medias/%s/tiles/%s/", dt.BookId, key)
+		serverUrl := fmt.Sprintf("%s/tiles/%s/", apiServer, key)
 		txt := fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
 		log.Printf("Create a new file %s \n", sortId)
 		util2.FileWrite([]byte(txt), dest)
@@ -89,7 +98,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 func getBookId(text string) string {
 	sUrl := strings.ToLower(text)
 	bookId := ""
-	m := regexp.MustCompile(`bookId=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	m := regexp.MustCompile(`bookid=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
 	if m != nil {
 		return m[1]
 	}
@@ -100,10 +109,10 @@ func getBookId(text string) string {
 	return bookId
 }
 
-func getCanvases(bookId string, cookieFile string) (tiles map[string]Item, err error) {
+func getCanvases(bookId string, cookieFile string, apiServer string) (tiles map[string]Item, err error) {
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
-	apiUrl := fmt.Sprintf("http://guji.sclib.org/medias/%s/tiles/infos.json", bookId)
+	apiUrl := fmt.Sprintf("%s/tiles/infos.json", apiServer)
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: cookieFile,
 		CookieJar:  jar,

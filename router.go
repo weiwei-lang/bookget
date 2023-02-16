@@ -317,6 +317,12 @@ func RegisterCommand() (err error) {
 		fmt.Println(err)
 		return
 	}
+	//037.云南古籍数字图书馆
+	err = Site.RegisterCommand("msq.ynlib.cn", sclib.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	return
 }
 
