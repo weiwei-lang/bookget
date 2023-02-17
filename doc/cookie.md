@@ -2,8 +2,7 @@
 bookget 数字图书馆下载工具
 
 #### 自定义用户 cookie
-部分网站下载，需要身份鉴权，可以在用户登录后复制浏览器中的cookie，给 bookget 创建 cookie.txt 模拟浏览器下载。
-
+部分网站需要身份鉴权。
 已知需要cookie.txt文件的网站，名单名下：
 1. [美国]国会图书馆 —— 中国大陆访问
 2. [美国]familysearch 家谱网
@@ -11,21 +10,20 @@ bookget 数字图书馆下载工具
 4. [中国]天一阁博物院古籍数字体平台
 
 #### 使用方法：
-1. 在 bookget 目录下，创建新的文件cookie.txt（用电脑记事本新建一个文件，重命名为cookie.txt）。
-2. 文件内容格式如下，一般只需要cookie/user-agent 两行的值，user-agent内容可以固定不变，而cookie的值，需要我们手动从浏览器中获取。
-
+1. 在 bookget 目录下，创建新的空白文件“cookie.txt”
 ```
 user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.49
-cookie: 此处替换为你在浏览器中复制的值
+cookie: [值]
 ```
-3. 在从浏览器中获取到正确的cookie后，复制到 cookie.txt 文件中，并保存文件。
-4. 运行 bookget 即可自动下载 urls.txt 中填写的图书URL。
+3. 在浏览器中找到正确的 “cookie” 替换`[值]`，并保存文件。
+4. 运行 bookget 即可。
 
 #### 例一：美国国会图书馆
 1. 以图书 https://www.loc.gov/item/c68002496/ 为例，在浏览器中打开网址。
 2. 按键盘快捷键 F12（或Ctrl + Alt + I)，弹出浏览器的【开发者工具】
 3. 刷新网页（按F5，或浏览器左上角刷新按钮）
-4. 复制 cookie / user-agent  到 cookie.txt 文件中，粘贴并保存文件。（见下图）
+4. 复制 cookie / user-agent  到 cookie.txt 文件中，粘贴并保存文件。（见下图）  
+
    ![](/doc/images/cookie-loc.png)   ![](/doc/images/loc-demo.png)
 
 
@@ -35,7 +33,8 @@ cookie: 此处替换为你在浏览器中复制的值
    为例，在浏览器中打开网址（需要用户登录成功后）。
 2. 按键盘快捷键 F12（或Ctrl + Alt + I)，弹出浏览器的【开发者工具】
 3. 刷新网页（按F5，或浏览器左上角刷新按钮）
-4. 复制 cookie / user-agent(此站点只用cookie，不用user-agent亦可)  到 cookie.txt 文件中，粘贴并保存文件。（见下图）
+4. 复制 cookie / user-agent(此站点只用cookie，不用user-agent亦可)  到 cookie.txt 文件中，粘贴并保存文件。（见下图）   
+
    ![](/doc/images/cookie-familysearch.png)   ![](/doc/images/familysearch-demo.png)
 
 5. 特别说明：familysearch 提供的https下载方式，有限速限流，大约10分钟只能下载20MB - 30MB.      
