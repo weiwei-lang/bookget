@@ -28,7 +28,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	if canvases.ImgUrls == nil {
 		return
 	}
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
 	util2.CreateShell(destPath, canvases.IiifUrls, nil)
 	//用户自定义起始页

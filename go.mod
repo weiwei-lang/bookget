@@ -3,6 +3,7 @@ module bookget
 go 1.19
 
 require (
+	github.com/andreburgaud/crypt2go v1.1.0
 	github.com/mattn/go-runewidth v0.0.14
 	github.com/valyala/fasthttp v1.34.0
 )

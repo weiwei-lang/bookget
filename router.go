@@ -11,6 +11,7 @@ import (
 	"bookget/site/China/rbkdocnpmtw"
 	"bookget/site/China/sclib"
 	"bookget/site/China/szlib"
+	"bookget/site/China/tianyige"
 	"bookget/site/China/twnlc"
 	"bookget/site/China/usthk"
 	"bookget/site/China/wzlib"
@@ -317,8 +318,14 @@ func RegisterCommand() (err error) {
 		fmt.Println(err)
 		return
 	}
-	//037.云南古籍数字图书馆
+	//038.云南古籍数字图书馆
 	err = Site.RegisterCommand("msq.ynlib.cn", sclib.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//039.天一阁博物院古籍数字化平台
+	err = Site.RegisterCommand("gj.tianyige.com.cn", tianyige.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -35,7 +35,7 @@ func StartDownload(dt *DownloadTask) (msg string, err error) {
 	if canvases.Size == 0 {
 		return
 	}
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 
 	config.CreateDirectory(dt.Url, dt.BookId)
 	//用户自定义起始页

@@ -21,7 +21,7 @@ func StartDownload(iTask int, taskUrl string) (msg string, err error) {
 	//通用下载
 	downloadUrls, startIndex := getDownloadUrls(taskUrl)
 
-	log.Printf("A total of %d files.\n", len(downloadUrls))
+	log.Printf(" %d files.\n", len(downloadUrls))
 	ext := file.Ext(downloadUrls[0])
 	bookId := ""
 	if len(downloadUrls) > 1 {

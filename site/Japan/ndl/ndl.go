@@ -26,7 +26,7 @@ func StartDownload(num int, uri, bookId string) {
 	log.Printf("Get %s  %s\n", name, uri)
 
 	pages := getPages(bookId)
-	log.Printf("A total of %d pages.\n", len(pages))
+	log.Printf(" %d pages.\n", len(pages))
 
 	//用户自定义起始页
 	size := len(pages)

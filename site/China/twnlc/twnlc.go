@@ -34,7 +34,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 	text := string(bs)
 	canvases := getImageUrls(text)
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 	if canvases.Size == 0 {
 		return
 	}

@@ -38,7 +38,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	if size == 0 {
 		return
 	}
-	log.Printf("A total of %d PDFs.\n", size)
+	log.Printf(" %d PDFs.\n", size)
 	//用户自定义起始页
 	i := util2.LoopIndexStart(size)
 	ext := ".pdf"

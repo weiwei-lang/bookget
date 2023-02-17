@@ -28,7 +28,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	if bookIds == nil || size == 0 {
 		return
 	}
-	log.Printf("\nA total of %d files.\n", size)
+	log.Printf("\n %d files.\n", size)
 	//用户自定义起始页
 	i := util2.LoopIndexStart(size)
 	for ; i < size; i++ {

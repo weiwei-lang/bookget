@@ -31,7 +31,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	if rstVolumes == nil {
 		return
 	}
-	log.Printf("A total of %d volumes.\n", len(rstVolumes.Volumes))
+	log.Printf(" %d volumes.\n", len(rstVolumes.Volumes))
 	for j, item := range rstVolumes.Volumes {
 		fmt.Printf("\r Test volume %d ... ", j+1)
 		canvases := getCanvases(bookId, item)
@@ -39,7 +39,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 			return
 		}
 		fmt.Println()
-		log.Printf("A total of %d pages.\n", canvases.Size)
+		log.Printf(" %d pages.\n", canvases.Size)
 
 		//用户自定义起始页
 		//i := util.LoopIndexStart(canvases.Size)

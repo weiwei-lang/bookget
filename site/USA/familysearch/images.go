@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-//家谱图像 https://www.familysearch.org/records/images/
+// 家谱图像 https://www.familysearch.org/records/images/
 func ImagesDownload(t *Downloader) (msg string, err error) {
 
 	name := util2.GenNumberSorted(t.Index)
@@ -25,7 +25,7 @@ func ImagesDownload(t *Downloader) (msg string, err error) {
 		return "", err
 	}
 	//用户自定义起始页
-	log.Printf("A total of %d Pages.\n", canvases.Size)
+	log.Printf(" %d Pages.\n", canvases.Size)
 
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)

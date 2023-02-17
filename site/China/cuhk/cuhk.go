@@ -39,7 +39,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	size := len(bookUrls)
-	log.Printf("A total of %d volumes \n", size)
+	log.Printf(" %d volumes \n", size)
 	for i := 0; i < size; i++ {
 		uri := bookUrls[i]
 		log.Printf("Test volume %d ... \n", i+1)
@@ -58,7 +58,7 @@ func do(bookId, bookUrl string) {
 	//用户自定义起始页
 	size := len(manifest.Pages)
 	i := util2.LoopIndexStart(size)
-	log.Printf("A total of %d pages.\n", size)
+	log.Printf(" %d pages.\n", size)
 	//访问带cookie
 	sCookie := curl2.HttpCookie2String(cookies)
 	for ; i < size; i++ {

@@ -82,6 +82,11 @@ func Init(ctx context.Context) bool {
 
 	//保存目录处理
 	_ = os.Mkdir(Conf.SaveFolder, os.ModePerm)
+
+	//默认，加载当前目录下cookie
+	if Conf.CookieFile == "" {
+		Conf.CookieFile = dir + string(os.PathSeparator) + "cookie.txt"
+	}
 	return true
 }
 

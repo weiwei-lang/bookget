@@ -71,7 +71,7 @@ func StartDownload(iTask int, taskUrl, bookId, text string) {
 	}
 	fmt.Println()
 	canvases.Size = len(canvases.ImgUrls)
-	log.Printf("A total of %d files.\n", canvases.Size)
+	log.Printf(" %d files.\n", canvases.Size)
 	if canvases.ImgUrls == nil {
 		return
 	}

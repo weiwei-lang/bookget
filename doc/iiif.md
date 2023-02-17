@@ -14,7 +14,7 @@ IIIF是一种业界标准，凡使用此标准的网站，都有提供IIIF Manif
 ```
 2022/03/27 08:00:54 Auto Detect 0001  https://dcollections.lib.keio.ac.jp/ja/kanseki/110x-24-1
 2022/03/27 08:00:55 Get 0001  https://dcollections.lib.keio.ac.jp/sites/default/files/iiif/KAN/110X-24-1/manifest.json
-2022/03/27 08:00:56 A total of 46 pages.
+2022/03/27 08:00:56  46 pages.
 2022/03/27 08:00:56 Save as  D:\src\bookget\Downloads\book.110X-24-1\dezoomify-rs.urls.bat  (5.38 KB)
 2022/03/27 08:00:56 Get 0001  https://iiif.lib.keio.ac.jp/iipsrv/KAN/110X-24-1/tif/001.tif/full/full/0/default.jpg
 ```

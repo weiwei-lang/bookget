@@ -41,7 +41,7 @@ func StartDownload(num int, uri, bookId string) {
 	if matches[1] != "" {
 		size, _ = strconv.Atoi(matches[1])
 	}
-	log.Printf("A total of %d pages.\n", size)
+	log.Printf(" %d pages.\n", size)
 	ext := ".jpeg"
 	//用户自定义起始页，特殊站点seq=1是第一页
 	i := util2.LoopIndexStart(size) + 1

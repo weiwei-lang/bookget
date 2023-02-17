@@ -71,7 +71,7 @@ func fetchBooks(dt *DownloadTask) (msg string, err error) {
 
 	//用户自定义起始页
 	size := len(pdfUrls)
-	log.Printf("A total of %d PDFs.\n", size)
+	log.Printf(" %d PDFs.\n", size)
 	i := util2.LoopIndexStart(size)
 	for ; i < size; i++ {
 		if pdfUrls[i][1] == "" {

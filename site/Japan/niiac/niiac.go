@@ -30,7 +30,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	size := len(imageUrls)
-	log.Printf("A total of %d pages.\n", size)
+	log.Printf(" %d pages.\n", size)
 
 	destPath := config.CreateDirectory(taskUrl, bookId)
 	util2.CreateShell(destPath, iiifUrls, nil)

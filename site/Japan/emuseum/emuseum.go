@@ -31,7 +31,7 @@ func StartDownload(num int, uri, bookId string) {
 	log.Printf("Get %s  %s\n", name, uri)
 
 	pages, iiifInfo := getPages(uri)
-	log.Printf("A total of %d pages.\n", len(pages))
+	log.Printf(" %d pages.\n", len(pages))
 
 	destPath := config.CreateDirectory(uri, bookId)
 	util2.CreateShell(destPath, iiifInfo, nil)

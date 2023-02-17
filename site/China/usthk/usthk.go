@@ -25,7 +25,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	name := util2.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	canvases := getImageUrls(taskUrl)
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 	if canvases.ImgUrls == nil {
 		return
 	}

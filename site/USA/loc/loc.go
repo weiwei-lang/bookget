@@ -30,7 +30,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 
 	pages := getPages(bookId)
 	size := len(pages)
-	log.Printf("A total of %d pages.\n", size)
+	log.Printf(" %d pages.\n", size)
 
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)

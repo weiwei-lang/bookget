@@ -34,7 +34,7 @@ func StartDownload(pageUrl, bookId string) {
 	if canvases.Size == 0 {
 		return
 	}
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 
 	destPath := config.CreateDirectory(pageUrl, bookId)
 	util2.CreateShell(destPath, canvases.IiifUrls, nil)

@@ -48,7 +48,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 
 	//用户自定义起始页
 	i := util2.LoopIndexStart(canvases.Size)
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
 	util2.CreateShell(destPath, canvases.IiifUrls, nil)
 	for ; i < canvases.Size; i++ {

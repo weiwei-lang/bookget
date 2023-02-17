@@ -27,7 +27,7 @@ func StartDownload(iTask int, text, bookId string) {
 	log.Printf("Get %s  %s\n", name, text)
 
 	pages, iiifInfo := getPages(bookId)
-	log.Printf("A total of %d pages.\n", len(pages))
+	log.Printf(" %d pages.\n", len(pages))
 
 	destPath := config.CreateDirectory(text, bookId)
 	util2.CreateShell(destPath, iiifInfo, nil)

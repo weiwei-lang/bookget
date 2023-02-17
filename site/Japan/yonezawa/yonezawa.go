@@ -37,7 +37,7 @@ func StartDownload(pageUrl, bookId string) {
 	if canvases.Size == 0 {
 		return
 	}
-	log.Printf("A total of %d pages.\n", canvases.Size)
+	log.Printf(" %d pages.\n", canvases.Size)
 	//用户自定义起始页
 	i := util2.LoopIndexStart(canvases.Size)
 	for ; i < canvases.Size; i++ {

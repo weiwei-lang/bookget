@@ -51,7 +51,7 @@ func download(t *Downloader) (msg string, err error) {
 	}
 	//用户自定义起始页
 	size := len(filmData.Images)
-	log.Printf("A total of %d Pages.\n", size)
+	log.Printf(" %d Pages.\n", size)
 
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)

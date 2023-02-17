@@ -29,12 +29,12 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	if bookUrls == nil || size == 0 {
 		return
 	}
-	log.Printf("A total of %d books.\n", size)
+	log.Printf(" %d books.\n", size)
 	imageUrls := make([]string, 0, 100*size)
 	iiifUrls := make([]string, 0, 100*size)
 	for k, u := range *bookUrls {
 		imgs, iiifs := getImageUrls(u)
-		fmt.Printf("\rBook %d has a total of %d pages. ", k+1, len(*imgs))
+		fmt.Printf("\rBook %d has  %d pages. ", k+1, len(*imgs))
 		if imgs != nil {
 			imageUrls = append(imageUrls, *imgs...)
 		}
@@ -43,7 +43,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		}
 	}
 	size = len(imageUrls)
-	log.Printf("\nA total of %d pages.\n", size)
+	log.Printf("\n %d pages.\n", size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
 	util2.CreateShell(destPath, iiifUrls, nil)
 	//用户自定义起始页
