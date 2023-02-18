@@ -2,74 +2,116 @@ package berlin
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
+	"bookget/lib/gohttp"
 	util2 "bookget/lib/util"
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
-	bookId := ""
-	m := regexp.MustCompile(`PPN=([A-Za-z0-9_-]+)`).FindStringSubmatch(taskUrl)
-	if m != nil {
-		bookId = m[1]
-		config.CreateDirectory(taskUrl, bookId)
-		StartDownload(iTask, taskUrl, bookId)
-	}
+	taskName := util2.GenNumberSorted(iTask)
+	log.Printf("Get %s  %s\n", taskName, taskUrl)
+	bookId := getBookId(taskUrl)
+	config.CreateDirectory(taskUrl, bookId)
+
+	StartDownload(taskUrl, bookId)
 	return "", err
 }
 
-func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
-	log.Printf("Get %s  %s\n", name, taskUrl)
-
-	var canvases Canvases
-	for i := 1; i < 10000; i++ {
-		sortId := util2.GenNumberSorted(i)
-		id := fmt.Sprintf("PHYS_%s", sortId)
-		actUrl := singleDziUrl(bookId, id)
-		bs, err := curl2.Get(actUrl, nil)
-		if err != nil {
-			break
-		}
-		dziUrl := string(bs)
-		if dziUrl == "" || !strings.Contains(dziUrl, "/dzi/") {
-			break
-		}
-		fmt.Printf("\rTest page %d ", i)
-		canvases.IiifUrls = append(canvases.IiifUrls, dziUrl)
-		imgUrl := singleImageUrl(bookId, sortId)
-		canvases.ImgUrls = append(canvases.ImgUrls, imgUrl)
+func getBookId(taskUrl string) string {
+	m := regexp.MustCompile(`PPN=([A-Za-z0-9_-]+)`).FindStringSubmatch(taskUrl)
+	if m != nil {
+		return m[1]
 	}
-	fmt.Println()
-	canvases.Size = len(canvases.ImgUrls)
+	return ""
+}
 
+func StartDownload(pageUrl, bookId string) {
+	canvases := getCanvases(bookId)
+	if canvases.Size == 0 {
+		return
+	}
+	log.Printf(" %d pages.\n", canvases.Size)
+
+	destPath := config.CreateDirectory(pageUrl, bookId)
+	util2.CreateShell(destPath, canvases.IiifUrls, nil)
 	//用户自定义起始页
 	i := util2.LoopIndexStart(canvases.Size)
-	log.Printf(" %d pages.\n", canvases.Size)
-	destPath := config.CreateDirectory(taskUrl, bookId)
-	util2.CreateShell(destPath, canvases.IiifUrls, nil)
+
 	for ; i < canvases.Size; i++ {
 		uri := canvases.ImgUrls[i] //从0开始
 		if uri == "" {
 			continue
 		}
+		ext := util2.FileExt(uri)
 		sortId := util2.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
+		filename := sortId + ext
+		dest := config.GetDestPath(pageUrl, bookId, filename)
 
-		fileName := sortId + ".jpg"
-		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		gohttp.FastGet(uri, gohttp.Options{
+			DestFile:    dest,
+			Overwrite:   false,
+			Concurrency: 1,
+			CookieFile:  config.Conf.CookieFile,
+			Headers: map[string]interface{}{
+				"user-agent": config.UserAgent,
+			},
+		})
 	}
 	return
 
 }
 
+func getCanvases(bookId string) (canvases Canvases) {
+	apiUrl := fmt.Sprintf("https://content.staatsbibliothek-berlin.de/dc/%s/manifest", bookId)
+	cli := gohttp.NewClient(gohttp.Options{
+		CookieFile: config.Conf.CookieFile,
+		Headers: map[string]interface{}{
+			"User-Agent": config.Conf.UserAgent,
+		},
+	})
+	resp, err := cli.Get(apiUrl)
+	if err != nil {
+		return
+	}
+	bs, _ := resp.GetBody()
+	var manifest = new(Manifest)
+	if err = json.Unmarshal(bs, manifest); err != nil {
+		log.Printf("json.Unmarshal failed: %s\n", err)
+		return
+	}
+	if len(manifest.Sequences) == 0 {
+		return
+	}
+
+	size := len(manifest.Sequences[0].Canvases)
+	canvases.ImgUrls = make([]string, 0, size)
+	canvases.IiifUrls = make([]string, 0, size)
+	for _, canvase := range manifest.Sequences[0].Canvases {
+		for _, image := range canvase.Images {
+			//dezoomify-rs URL
+			//https://ngcs-core.staatsbibliothek-berlin.de/dzi/PPN3303598630/PHYS_0001.dzi
+			m := regexp.MustCompile("/dc/([A-z0-9]+)-([A-z0-9]+)/full").FindStringSubmatch(image.Resource.Id)
+			iiiInfo := fmt.Sprintf("https://ngcs-core.staatsbibliothek-berlin.de/dzi/%s/PHYS_%s.dzi", bookId, m[2])
+			canvases.IiifUrls = append(canvases.IiifUrls, iiiInfo)
+
+			//JPEG URL
+			//https://content.staatsbibliothek-berlin.de/dc/3303598630-0001/full/full/0/default.jpg
+			canvases.ImgUrls = append(canvases.ImgUrls, image.Resource.Id)
+		}
+	}
+	canvases.Size = size
+	return
+}
+
+// tif
 func singleImageUrl(bookId, id string) string {
 	uri := fmt.Sprintf("https://content.staatsbibliothek-berlin.de/dms/%s/full/0/0000%s.jpg?original=true",
 		bookId, id)
+	//https://content.staatsbibliothek-berlin.de/dms/PPN3303598630/full/0/00000001.jpg?original=true
 	return uri
 }
 
