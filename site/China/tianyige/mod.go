@@ -3,8 +3,8 @@ package tianyige
 import (
 	"crypto/aes"
 	"encoding/base64"
+	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/andreburgaud/crypt2go/ecb"
@@ -32,7 +32,9 @@ func encrypt(pt, key []byte) string {
 }
 
 func getToken() string {
-	pt := []byte(strconv.Itoa(rand.Intn(900000)+100000) + strconv.FormatInt(time.Now().UnixMilli(), 10))
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	//pt := []byte(strconv.Itoa(r.Intn(900000)+100000) + strconv.FormatInt(time.Now().UnixMilli(), 10))
+	pt := []byte(fmt.Sprintf("%.6d%d", r.Int31()%10000, time.Now().UnixMilli()))
 	// Key size for AES is either: 16 bytes (128 bits), 24 bytes (192 bits) or 32 bytes (256 bits)
 	key := []byte(APP_KEY)
 	return encrypt(pt, key)
