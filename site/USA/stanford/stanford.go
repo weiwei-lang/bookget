@@ -1,7 +1,6 @@
 package stanford
 
 import (
-	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/util"
 	"bookget/site/Universal/iiif"
@@ -15,7 +14,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 	m := regexp.MustCompile(`/view/([A-z\d]+)`).FindStringSubmatch(taskUrl)
 	if m != nil {
 		bookId = m[1]
-		config.CreateDirectory(taskUrl, bookId)
+		//config.CreateDirectory(taskUrl, bookId)
 		StartDownload(iTask, taskUrl, bookId)
 	}
 	return "", err
@@ -32,7 +31,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	size := len(bookUrls)
 	log.Printf(" %d volumes.\n", size)
 	for i := 0; i < size; i++ {
-		iiif.StartDownload(bookUrls[i], bookId)
+		iiif.StartDownload(bookUrls[i], fmt.Sprintf("%s_Volume%d", bookId, i+1))
 	}
 	return
 }

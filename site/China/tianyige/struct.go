@@ -216,29 +216,30 @@ type BookFascicle struct {
 }
 
 type PageImage struct {
-	Records []struct {
-		ImageId     string      `json:"imageId"`
-		ImageName   string      `json:"imageName"`
-		DirectoryId string      `json:"directoryId"`
-		FascicleId  string      `json:"fascicleId"`
-		CatalogId   string      `json:"catalogId"`
-		Sort        int         `json:"sort"`
-		Type        int         `json:"type"`
-		IsParse     interface{} `json:"isParse"`
-		Description interface{} `json:"description"`
-		Creator     string      `json:"creator"`
-		CreateTime  string      `json:"createTime"`
-		Updator     string      `json:"updator"`
-		UpdateTime  string      `json:"updateTime"`
-		IsDeleted   int         `json:"isDeleted"`
-		OcrInfo     interface{} `json:"ocrInfo"`
-		File        interface{} `json:"file"`
-	} `json:"records"`
-	Total       int  `json:"total"`
-	Size        int  `json:"size"`
-	Current     int  `json:"current"`
-	SearchCount bool `json:"searchCount"`
-	Pages       int  `json:"pages"`
+	Records     []ImageRecord `json:"records"`
+	Total       int           `json:"total"`
+	Size        int           `json:"size"`
+	Current     int           `json:"current"`
+	SearchCount bool          `json:"searchCount"`
+	Pages       int           `json:"pages"`
+}
+type ImageRecord struct {
+	ImageId     string      `json:"imageId"`
+	ImageName   string      `json:"imageName"`
+	DirectoryId string      `json:"directoryId"`
+	FascicleId  string      `json:"fascicleId"`
+	CatalogId   string      `json:"catalogId"`
+	Sort        int         `json:"sort"`
+	Type        int         `json:"type"`
+	IsParse     interface{} `json:"isParse"`
+	Description interface{} `json:"description"`
+	Creator     string      `json:"creator"`
+	CreateTime  string      `json:"createTime"`
+	Updator     string      `json:"updator"`
+	UpdateTime  string      `json:"updateTime"`
+	IsDeleted   int         `json:"isDeleted"`
+	OcrInfo     interface{} `json:"ocrInfo"`
+	File        interface{} `json:"file"`
 }
 
 // 基本信息
@@ -339,3 +340,27 @@ type Canvases struct {
 	ImgOcrUrls []string
 	Size       int
 }
+
+type ResponseVolume struct {
+	Code int      `json:"code"`
+	Msg  string   `json:"msg"`
+	Data []Volume `json:"data"`
+}
+
+type Volume struct {
+	FascicleId   string      `json:"fascicleId"`
+	CatalogId    string      `json:"catalogId"`
+	Name         string      `json:"name"`
+	Introduction interface{} `json:"introduction"`
+	GradeId      string      `json:"gradeId"`
+	Sort         int         `json:"sort"`
+	Creator      interface{} `json:"creator"`
+	CreateTime   string      `json:"createTime"`
+	Updator      interface{} `json:"updator"`
+	UpdateTime   string      `json:"updateTime"`
+	IsDeleted    int         `json:"isDeleted"`
+	FilePath     interface{} `json:"filePath"`
+	ImageCount   interface{} `json:"imageCount"`
+}
+
+type Parts map[string][]ImageRecord

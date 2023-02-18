@@ -161,7 +161,7 @@ http://shanben.ioc.u-tokyo.ac.jp/main_p.php?nu=C5613401&order=rn_no&no=00870
 ```
 https://www.digital.archives.go.jp/DAS/meta/listPhoto?LANG=default&BID=F1000000000000095447&ID=&NO=&TYPE=
 ```
-7 [日本][东洋文库]( http://dsr.nii.ac.jp/toyobunko/index.html.ja)
+7. [日本][东洋文库]( http://dsr.nii.ac.jp/toyobunko/index.html.ja)
 ```
 http://dsr.nii.ac.jp/toyobunko/XI-6-A-16/V-1/
 ```

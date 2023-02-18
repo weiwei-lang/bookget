@@ -26,39 +26,51 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	if dt.BookId == "" {
 		return "", err
 	}
-	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
 
 	name := util.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
 
-	imageIds, err := getImageIds(dt.BookId, config.Conf.CookieFile)
+	imageRecords, err := getImageRecord(dt.BookId, config.Conf.CookieFile)
 	if err != nil {
 		log.Println("A cookie file is required.")
 		return
 	}
-	maxSize := len(imageIds)
-	log.Printf(" %d pages.\n", maxSize)
-	//用户自定义起始页
-	i := util.LoopIndexStart(maxSize)
-	for ; i < maxSize; i++ {
-		uri, _, err := getImageById(imageIds[i], config.Conf.CookieFile)
-		if uri == "" || err != nil {
+	maxSize := len(imageRecords)
+	volumes := getBookVolumes(dt.BookId, config.Conf.CookieFile)
+	log.Printf(" %d volumes(parts),  %d pages.\n", len(volumes), maxSize)
+
+	parts := make(Parts)
+	for _, record := range imageRecords {
+		parts[record.FascicleId] = append(parts[record.FascicleId], record)
+	}
+	for p, vol := range volumes {
+		if config.Conf.Volume > 0 && config.Conf.Volume != p+1 {
 			continue
 		}
-		ext := util.FileExt(uri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, uri)
-		fileName := sortId + ext
-		dest := config.GetDestPath(dt.Url, dt.BookId, fileName)
-		gohttp.FastGet(uri, gohttp.Options{
-			Concurrency: config.Conf.Threads,
-			DestFile:    dest,
-			Overwrite:   false,
-			Headers: map[string]interface{}{
-				"user-agent": config.UserAgent,
-			},
-		})
+		id := fmt.Sprintf("%s_Volume%d", dt.BookId, vol.Sort)
+		dt.SavePath = config.CreateDirectory(dt.Url, id)
+		log.Printf(" %d/%d volume, %d pages \n", vol.Sort, len(volumes), len(parts[vol.FascicleId]))
+		for i, record := range parts[vol.FascicleId] {
+			uri, _, err := getImageById(record.ImageId, config.Conf.CookieFile)
+			if uri == "" || err != nil {
+				continue
+			}
+			ext := util.FileExt(uri)
+			sortId := util.GenNumberSorted(i + 1)
+			log.Printf("Get %s  %s\n", sortId, uri)
+			fileName := sortId + ext
+			dest := config.GetDestPath(dt.Url, id, fileName)
+			gohttp.FastGet(uri, gohttp.Options{
+				Concurrency: config.Conf.Threads,
+				DestFile:    dest,
+				Overwrite:   false,
+				Headers: map[string]interface{}{
+					"user-agent": config.UserAgent,
+				},
+			})
+		}
 	}
+
 	return "", nil
 }
 
@@ -77,7 +89,7 @@ func getBookId(text string) string {
 	return bookId
 }
 
-func getImageIds(imageId string, cookieFile string) (imageIds []string, err error) {
+func getImageRecord(imageId string, cookieFile string) (imageRecords []ImageRecord, err error) {
 	//https://gj.tianyige.com.cn/fileUpload/56956d82679111ec85ee7020840b69ac/ANB/ANB_IMAGE_PHOTO/ANB/ANB_IMAGE_PHOTO/20220324/febd8c1dcd134c33b5c1cad8883dd1cd1648107167499.jpg
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
@@ -119,10 +131,8 @@ func getImageIds(imageId string, cookieFile string) (imageIds []string, err erro
 	if err = json.Unmarshal(bs, &resObj); resObj.Code != 200 {
 		return
 	}
-	imageIds = make([]string, 0, len(resObj.Data.Records))
-	for _, d := range resObj.Data.Records {
-		imageIds = append(imageIds, d.ImageId)
-	}
+	imageRecords = make([]ImageRecord, len(resObj.Data.Records))
+	copy(imageRecords, resObj.Data.Records)
 	return
 }
 
@@ -183,4 +193,39 @@ func getImageById(imageId, cookieFile string) (imgUrl, ocrUrl string, err error)
 		}
 	}
 	return
+}
+
+func getBookVolumes(bookId string, cookieFile string) (volumes []Volume) {
+	//https://gj.tianyige.com.cn/g/sw-anb/api/getFasciclesByCataId?catalogId=c56c5afbb95f667c96c57b6d3b4c5f0c
+	jar, _ := cookiejar.New(nil)
+	apiUrl := fmt.Sprintf("https://gj.tianyige.com.cn/g/sw-anb/api/getFasciclesByCataId?catalogId=%s", bookId)
+
+	token := getToken()
+	cli := gohttp.NewClient(gohttp.Options{
+		CookieFile: cookieFile,
+		CookieJar:  jar,
+		Headers: map[string]interface{}{
+			"User-Agent":   config.Conf.UserAgent,
+			"Content-Type": "application/json;charset=UTF-8",
+			"token":        token,
+			"appId":        APP_ID,
+		},
+	})
+	resp, err := cli.Get(apiUrl)
+	if err != nil {
+		return nil
+	}
+	bs, _ := resp.GetBody()
+	if bs == nil || resp.GetStatusCode() == 401 {
+		fmt.Printf("Please try again later.[401 %s]\n", resp.GetReasonPhrase())
+		return nil
+	}
+	var resObj ResponseVolume
+	if err = json.Unmarshal(bs, &resObj); err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	volumes = make([]Volume, len(resObj.Data))
+	copy(volumes, resObj.Data)
+	return volumes
 }
