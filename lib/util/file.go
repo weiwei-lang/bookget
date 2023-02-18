@@ -42,7 +42,7 @@ func FileWrite(b []byte, filename string) (err error) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, b)
 	fp.Write(buf.Bytes())
-	log.Printf("Save as  %s  (%s)\n", filename, ByteUnitString(int64(len(buf.Bytes()))))
+	log.Printf("save as  %s  (%s)\n", filename, ByteUnitString(int64(len(buf.Bytes()))))
 	return nil
 }
 
@@ -77,7 +77,7 @@ func FileName(uri string) string {
 	return name
 }
 
-//压缩文件
+// 压缩文件
 func Zip(srcFile string, destZip string) error {
 	zipFile, err := os.Create(destZip)
 	if err != nil {
@@ -119,7 +119,7 @@ func Zip(srcFile string, destZip string) error {
 	return err
 }
 
-//解压缩
+// 解压缩
 func Unzip(zipFile string, destDir string, sortId string) error {
 	zipReader, err := zip.OpenReader(zipFile)
 	if err != nil {

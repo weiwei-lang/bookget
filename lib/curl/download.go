@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-//FastGet 下载器
+// FastGet 下载器
 func FastGet(uri, dest string, header map[string]string, ignore bool) (size int64, err error) {
 	if ignore {
 		//文件存在，跳过
@@ -78,7 +78,7 @@ func execDownload(uri, dest, method string, data []byte, header map[string]strin
 		fmt.Fprintf(os.Stdout, "\r100%%[================================================>]  %s/%s  %s/s    in %s", util.ByteUnitString(int64(d.Size())),
 			util.ByteUnitString(int64(d.TotalSize())), util.ByteUnitString(int64(d.AvgSpeed())), d.TotalCost())
 		fmt.Println()
-		log.Printf("Save as  %s  (%s)\n", dest, util.ByteUnitString(size))
+		log.Printf("save as  %s  (%s)\n", dest, util.ByteUnitString(size))
 	}(dl)
 
 	dl.totalSize = uint64(rsp.ContentLength)

@@ -29,8 +29,8 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	size := len(bookUrls)
-	log.Printf(" %d volumes.\n", size)
 	for i := 0; i < size; i++ {
+		log.Printf(" %d/%d volume.\n", i+1, size)
 		iiif.StartDownload(bookUrls[i], fmt.Sprintf("%s_Volume%d", bookId, i+1))
 	}
 	return

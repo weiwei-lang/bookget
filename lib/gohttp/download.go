@@ -108,7 +108,7 @@ func (r *Response) dlFile(d *Download) (size int64, err error) {
 		fmt.Fprintf(os.Stdout, "\r100%%[================================================>]  %s/%s  %s/s    in %s", ByteUnitString(int64(d.Size())),
 			ByteUnitString(int64(d.TotalSize())), ByteUnitString(int64(d.AvgSpeed())), d.TotalCost())
 		fmt.Println()
-		log.Printf("Save as  %s  (%s)\n", d.Dest, ByteUnitString(size))
+		log.Printf("save as  %s  (%s)\n", d.Dest, ByteUnitString(size))
 	}(d)
 
 	// Allocate the file completely so that we can write concurrently
