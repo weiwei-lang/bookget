@@ -35,7 +35,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	if dt.BookId == "" {
 		return "", err
 	}
-	dt.SavePath = config.CreateDirectory(dt.UrlParsed.Host, dt.BookId)
+	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
 
 	name := util2.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)

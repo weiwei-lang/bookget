@@ -37,7 +37,7 @@ func GetHeaderFile(srcPath string) (header map[string]string, err error) {
 		}
 		if "cookie" == strings.ToLower(k) {
 			header["Cookie"] = v
-		} else if "user-agent" == strings.ToLower(v) {
+		} else if "user-agent" == strings.ToLower(k) {
 			header["User-Agent"] = v
 		} else {
 			header[k] = v

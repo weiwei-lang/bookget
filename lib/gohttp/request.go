@@ -271,7 +271,7 @@ func (r *Request) parseCookieFile() {
 		}
 		if "cookie" == strings.ToLower(k) {
 			r.req.Header.Add("Cookie", v)
-		} else if "user-agent" == strings.ToLower(v) {
+		} else if "user-agent" == strings.ToLower(k) {
 			r.req.Header.Set("User-Agent", v)
 		} else {
 			r.req.Header.Set(k, v)
