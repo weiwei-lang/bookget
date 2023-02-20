@@ -71,7 +71,8 @@ http://221.13.137.120:8090/productshow.php?cid=4&id=112
 https://oyjy.wzlib.cn/resource/?id=61e4c764505415b2e6921e5e
 https://oyjy.wzlib.cn/resource/?id=62c56bb357de1ef36b1f5614
 ```
-13. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)
+13. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)   
+    注：需配合 dezoomify-rs zhudw 修改版，才可以下载。
 ```
 http://218.2.105.121/#/details?id=0000113BY03-0001
 ```
