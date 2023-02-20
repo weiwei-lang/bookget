@@ -56,7 +56,7 @@ func Init(ctx context.Context) bool {
 	flag.BoolVar(&Conf.Help, "h", false, "显示帮助")
 	flag.BoolVar(&Conf.Version, "v", false, "显示版本")
 	if string(os.PathSeparator) == "\\" {
-		flag.StringVar(&Conf.DezoomifyRs, "rs", "dezoomify-rs.exe", "自定义dezoomify-rs路径，例如：C:\\Windows\\dezoomify-rs.exe")
+		flag.StringVar(&Conf.DezoomifyRs, "rs", "dezoomify-rs.exe", "自定义dezoomify-rs路径，例如：C:\\Windows\\System32\\dezoomify-rs.exe")
 	} else {
 		flag.StringVar(&Conf.DezoomifyRs, "rs", "dezoomify-rs", "自定义dezoomify-rs路径，例如：/usr/local/bin/dezoomify-rs")
 	}

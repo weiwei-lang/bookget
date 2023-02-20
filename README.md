@@ -14,13 +14,14 @@ bookget 数字图书馆下载工具
 1. [中国][香港科技大学图书馆](https://lbezone.ust.hk/)
 1. [中国][台北古籍与特藏文献](http://rbook.ncl.edu.tw/)
 1. [中国][台北故宫博物院 – 善本古籍 ](https://rbk-doc.npm.edu.tw/)
-1. [中国][四川古籍数字图书馆](http://guji.sclib.org/qt-zxsk.html)
-1. [中国][云南古籍数字图书馆](http://msq.ynlib.cn/)
+1. [中国][四川省古籍数字图书馆](http://guji.sclib.org/qt-zxsk.html)
+1. [中国][云南省古籍数字图书馆](http://msq.ynlib.cn/)
 1. [中国][天一阁博物院古籍数字图书馆](https://gj.tianyige.com.cn/)
 1. [中国][广州大典](http://gzdd.gzlib.gov.cn/Hrcanton/)
 1. [中国][深圳市古籍数字图书馆](https://yun.szlib.org.cn/stgj2021/)
 1. [中国][洛阳市图书馆](http://221.13.137.120:8090/index.php)
 1. [中国][温州市图书馆-瓯越记忆](https://oyjy.wzlib.cn/pdf/)
+1. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)
 
 ### 欧美数字图书馆：
 1. [美国][哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)

@@ -18,7 +18,6 @@ import (
 // FastGet 下载器
 func FastGet(uri, dest string, header map[string]string, ignore bool) (size int64, err error) {
 	if ignore {
-		//文件存在，跳过
 		fi, err := os.Stat(dest)
 		if err == nil && fi.Size() > 0 {
 			return 0, nil

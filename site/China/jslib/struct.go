@@ -1,4 +1,4 @@
-package sclib
+package jslib
 
 // 自定义一个排序类型
 type strs []string
@@ -12,9 +12,9 @@ type Item struct {
 	Height      int    `json:"height"`
 	Resolutions int    `json:"resolutions"`
 	TileSize    struct {
-		H int `json:"h"`
-		W int `json:"w"`
-	} `json:"tile_size"`
+		H int `json:"height"`
+		W int `json:"width"`
+	} `json:"tileSize"`
 	Width int `json:"width"`
 }
 

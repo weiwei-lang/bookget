@@ -16,7 +16,6 @@ import (
 func (r *Request) FastGet(uri string, opts ...Options) (resp *Response, err error) {
 	if len(opts) > 0 {
 		r.opts = opts[0]
-		//文件存在，跳过
 		if !opts[0].Overwrite {
 			fi, err := os.Stat(opts[0].DestFile)
 			if err == nil && fi.Size() > 0 {

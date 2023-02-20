@@ -51,7 +51,6 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	ext := util2.FileExt(pdfUrl)
 	dest := config.GetDestPath(dt.Url, dt.BookId, dt.BookId+ext)
 
-	//文件存在，跳过
 	fi, err := os.Stat(dest)
 	if err == nil && fi.Size() > 0 {
 		return

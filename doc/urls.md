@@ -71,6 +71,10 @@ http://221.13.137.120:8090/productshow.php?cid=4&id=112
 https://oyjy.wzlib.cn/resource/?id=61e4c764505415b2e6921e5e
 https://oyjy.wzlib.cn/resource/?id=62c56bb357de1ef36b1f5614
 ```
+13. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)
+```
+http://218.2.105.121/#/details?id=0000113BY03-0001
+```
 
 ### 欧美数字图书馆：
 1. [美国][哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)   

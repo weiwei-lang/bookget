@@ -48,7 +48,6 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		log.Printf("Get %s  %s\n", sortId, extId)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		//文件存在，跳过
 		fi, err := os.Stat(dest)
 		if err == nil && fi.Size() > 0 {
 			continue

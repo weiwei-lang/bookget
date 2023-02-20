@@ -3,13 +3,13 @@ package sclib
 import (
 	"bookget/config"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"regexp"
 	"sort"
 	"strconv"
@@ -39,18 +39,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	}
 	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
 
-	name := util2.GenNumberSorted(dt.Index)
+	name := util.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
-
-	//apiServer
-	var apiServer string
-	u := dt.UrlParsed
-	if u.Host == "msq.ynlib.cn" {
-		apiServer = fmt.Sprintf("%s://%s/medias2022/%s", u.Scheme, u.Host, dt.BookId)
-	} else {
-		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, dt.BookId)
-	}
-
+	apiServer := getApiServer(dt.BookId, dt.UrlParsed)
 	tiles, err := getCanvases(dt.BookId, config.Conf.CookieFile, apiServer)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -77,32 +68,45 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	for key, item := range tiles {
 		k := regexp.MustCompile(`(\d+)`).FindString(key)
 		i, _ := strconv.Atoi(k)
-		sortId := fmt.Sprintf("%s.json", util2.GenNumberSorted(i))
+		sortId := fmt.Sprintf("%s.json", util.GenNumberSorted(i))
 		dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
-		//文件存在，跳过
-		fi, err := os.Stat(dest)
-		if err == nil && fi.Size() > 0 {
-			continue
-		}
 		serverUrl := fmt.Sprintf("%s/tiles/%s/", apiServer, key)
 		txt := fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
 		log.Printf("Create a new file %s \n", sortId)
-		util2.FileWrite([]byte(txt), dest)
+		util.FileWrite([]byte(txt), dest)
 		dziUrls = append(dziUrls, sortId)
 	}
 	sort.Sort(strs(dziUrls))
-	util2.CreateShell(dt.SavePath, dziUrls, nil)
+	util.CreateShell(dt.SavePath, dziUrls, nil)
 	return "请手动运行 dezoomify-rs.urls 文件", nil
 }
 
+func getApiServer(bookId string, u *url.URL) string {
+	var apiServer string
+	switch u.Host {
+	case "msq.ynlib.cn":
+		apiServer = fmt.Sprintf("%s://%s/medias2022/%s", u.Scheme, u.Host, bookId)
+		break
+	case "guji.sclib.org":
+		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
+		break
+	case "218.2.105.121":
+		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
+		break
+	default:
+		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
+	}
+	return apiServer
+}
+
 func getBookId(text string) string {
-	sUrl := strings.ToLower(text)
-	bookId := ""
-	m := regexp.MustCompile(`bookid=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	text = strings.ToLower(text)
+	var bookId string
+	m := regexp.MustCompile(`bookid=([A-z0-9_-]+)`).FindStringSubmatch(text)
 	if m != nil {
 		return m[1]
 	}
-	m = regexp.MustCompile(`id=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	m = regexp.MustCompile(`id=([A-z0-9_-]+)`).FindStringSubmatch(text)
 	if m != nil {
 		bookId = m[1]
 	}
@@ -125,7 +129,11 @@ func getCanvases(bookId string, cookieFile string, apiServer string) (tiles map[
 		return nil, err
 	}
 	bs, _ := resp.GetBody()
-	var result Result
+	if bs == nil {
+		err = errors.New(resp.GetReasonPhrase())
+		return
+	}
+	var result ResponseBody
 	if err = json.Unmarshal(bs, &result); err != nil {
 		return
 	}

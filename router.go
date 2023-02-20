@@ -5,6 +5,7 @@ import (
 	"bookget/site/China/cuhk"
 	"bookget/site/China/gzlib"
 	"bookget/site/China/idp"
+	"bookget/site/China/jslib"
 	"bookget/site/China/luoyang"
 	"bookget/site/China/nlc"
 	"bookget/site/China/npmtw"
@@ -326,6 +327,12 @@ func RegisterCommand() (err error) {
 	}
 	//039.天一阁博物院古籍数字化平台
 	err = Site.RegisterCommand("gj.tianyige.com.cn", tianyige.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//040.江苏珍贵古籍数字图书馆
+	err = Site.RegisterCommand("218.2.105.121", jslib.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

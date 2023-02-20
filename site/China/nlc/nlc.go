@@ -111,7 +111,6 @@ func fetchOneBook(i int, sUrl string, dt *DownloadTask) {
 	}
 	filename := sortId + ".pdf"
 	dest := config.GetDestPath(dt.Url, dt.BookId, filename)
-	//文件存在，跳过
 	fi, err := os.Stat(dest)
 	if err == nil && fi.Size() > 0 {
 		return
