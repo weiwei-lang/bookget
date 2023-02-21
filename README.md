@@ -2,11 +2,8 @@
 
 <a href="https://github.com/deweizhu/bookget/actions/workflows/go.yml"><img src="https://github.com/deweizhu/bookget/actions/workflows/go.yml/badge.svg" alt="Go build Status"></a>
 
-bookget 数字图书馆下载工具   
-
-鸣谢：
-[书格shuge.org](https://new.shuge.org/) 有品格的数字古籍图书馆。    
-![](https://new.shuge.org/wp-content/themes/artview/images/layout/logo.png)
+bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。    
+初次见面，让我们几分钟时间学习，阅读使用手册 [bookget Wiki](https://github.com/deweizhu/bookget/wiki)，这不是必须的，但可以为我们以后使用节约更多的时间。
 
 ### 中国地区数字图书馆：
 1. [中国][国家图书馆](http://read.nlc.cn/thematDataSearch/toGujiIndex)
@@ -58,43 +55,8 @@ bookget 数字图书馆下载工具
 1. [韩国][国家图书馆](https://www.dlibrary.go.kr/) [或开放数据](https://lod.nl.go.kr/)
     (注：请使用v0.2.6版。新版不再支持。)
 
+   
 
-## 用户手册
-请参见以下文档：
-1. [支持的URL格式](/doc/urls.md)
-2. [IIIF自动检测下载](/doc/iiif.md)
-3. [批量http下载](/doc/http.md)
-4. [高级：自定义用户cookie ](/doc/cookie.md)
-5. [旧版：PDF手册](/doc/pdf/) 适用于v0.2.6及更低版本。
-
-### 下载 *bookget*
-第一次使用，请按以下步骤操作。
-
-1. 打开 [最新正式版网页](https://github.com/deweizhu/bookget/releases/latest), 下载匹配你操作系统的版本 (Windows, MacOS, 或 Linux),
-2. 解压缩到电脑中任意文件夹下。
-3. 双击运行，并按提示输入URL。（例如：欽定古今圖書集成 - 中国国家图书馆）。
-```
-$ bookget
-Enter an URL:
--> http://read.nlc.cn/allSearch/searchDetail?searchType=1002&showType=1&indexName=data_892&fid=411999021002
-```
-4. 【可选】把 bookget 放到 C:\windows 目录下（Linux用户是 /usr/local/bin 或 /usr/bin/目录）。   
-   在终端下输入命令：`bookget "URL"` （推荐用双引号包含网址）,按回车键开始下载。   
-   Windows 终端：cmd / PowerShell   
-   Linux / MacOS终端：bash / sh / zsh
-```
-$ bookget "http://read.nlc.cn/allSearch/searchDetail?searchType=1002&showType=1&indexName=data_892&fid=411999021002"
-```
-5. 【可选】批量下载多个URL。在终端内输入以下命令：
-```
-$ bookget -i urls.txt
-```
-提示：urls.txt可以是任意文件名，内容是要下载的图书URL，一行一个URL，回车换行。
-
-6. 【可选】带上cookie下载：
-```
-$ bookget -c cookie.txt [URL]
-```
 ### 支持的更多参数
 
 ```
@@ -132,24 +94,6 @@ Usage: bookget [OPTION]... [URL]...
         指定图片宽度像素。推荐2400，若>6400为最大图 (default 7000)
 ```
 
-
-### 批量下载
-`bookget -i urls.txt -c .\cookie.txt -a 1 -n 1 -ext ".jpg"`    
-更多参数，请使用 bookget -h 查看。
-
-urls.txt内容如下：   
-在urls.txt文件中，毎行一个URL，回车换行，可以有多个URL。
-```
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=1&page=(1-155)&twoThreeYn=N
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=2&page=(1-163)&twoThreeYn=N
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=3&page=(1-161)&twoThreeYn=N
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=4&page=(1-163)&twoThreeYn=N
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=5&page=(1-167)&twoThreeYn=N
-http://viewer.nl.go.kr:8080/nlmivs/view_image.jsp?cno=CNTS-00047981911&vol=6&page=(1-135)&twoThreeYn=N
-```
-
-cookie.txt 格式如下：
-```
-Cookie: WMONID=soB981Rm1Zd; _ga=GA1.3.87528781.1649496227; PCID=f3195068-16ea-8747-eedd-b37cf8523975-1649496227656; _INSIGHT_CK_1101=a658ca0653f5817a32a1b3a6942409e8_96227|1cbbd600ff48120ce10fed8a58ea4686_80164:1650282843000; JSESSIONID="0cfPybFlA0z2qRiy8Fr7sJCtdJooLnY8oACN62iv.VWWAS1:tv-1"; _gid=GA1.3.1049050692.1659041876
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.71
-```
+鸣谢：
+[书格shuge.org](https://new.shuge.org/) 有品格的数字古籍图书馆。    
+![](https://new.shuge.org/wp-content/themes/artview/images/layout/logo.png)
