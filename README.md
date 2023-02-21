@@ -57,44 +57,6 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
     (注：请使用v0.2.6版。新版不再支持。)
 
    
-
-### 支持的更多参数
-
-```
-$ bookget -h
-Usage: bookget [OPTION]... [URL]...
-  -a int
-        自动检测下载URL。可选值[0|1|2]，;0=默认;
-        1=通用批量下载（类似IDM、迅雷）;
-        2= IIIF manifest.json 自动检测下载图片
-  -c string
-        指定cookie.txt文件路径
-  -cdn int
-        使用CDN加速，可选值[0|1]。0=否，1=是。仅对 www.loc.gov 有效。
-  -ext string
-        指定文件扩展名[.jpg|.tif|.png]等
-  -fn int
-        保存文件名规则。可选值[0|1]。0=中文名，1=数字名。仅对 read.nlc.cn 有效。 (default 1)
-  -h    显示帮助
-  -i string
-        下载的URLs，指定任意本地文件，例如：urls.txt
-  -mp int
-        合并PDF文件下载，可选值[0|1]。0=否，1=是。仅对 rbk-doc.npm.edu.tw 有效。
-  -n uint
-        最大并发连接数 (default 16)
-  -o string
-        下载保存到目录 (default "D:/bookget/bookget")
-  -rs string
-        自定义dezoomify-rs路径，例如：D:/bookget/dezoomify-rs (default "dezoomify-rs")
-  -seq int
-        图书起始页面数字
-  -ua string
-        user-agent (default "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0")
-  -v    显示版本
-  -w int
-        指定图片宽度像素。推荐2400，若>6400为最大图 (default 7000)
-```
-
 鸣谢：
 [书格shuge.org](https://new.shuge.org/) 有品格的数字古籍图书馆。    
 ![](https://new.shuge.org/wp-content/themes/artview/images/layout/logo.png)
