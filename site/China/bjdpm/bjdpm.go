@@ -59,7 +59,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 
 	config.Conf.FileExt = "." + dziFormat.Format
 	dziUrls := make([]string, 0)
-	dziUrls = append(dziUrls, dest)
+	dziUrls = append(dziUrls, sortId)
 
 	header := make(map[string]string, 4)
 	header["Origin"] = "https://minghuaji.dpm.org.cn"

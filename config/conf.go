@@ -26,7 +26,8 @@ type Input struct {
 	UserAgent          string //自定义UserAgent
 	AutoDetect         int    //自动检测下载URL。可选值[0|1|2]，;0=默认;1=通用批量下载（类似IDM、迅雷）;2= IIIF manifest.json 自动检测下载图片
 	MergePDFs          int    //;台北故宫博物院 - 善本古籍，是否整册合并一个PDF下载？0=否，1=是。整册合并一个PDF遇到某一册最后一章节【无影像】会导致下载失败。 如：新刊校定集注杜詩 三十六卷 第二十四冊 聞惠子過東溪 无影像
-	DezoomifyRs        string //dezoomify-rs.exe 路径
+	DezoomifyPath      string //dezoomify-rs 本地目录位置
+	DezoomifyRs        string //dezoomify-rs 参数
 	FileExt            string //指定下载的扩展名
 	Threads            uint
 	Help               bool
@@ -55,11 +56,22 @@ func Init(ctx context.Context) bool {
 	flag.IntVar(&Conf.AutoDetect, "a", 0, "自动检测下载URL。可选值[0|1|2]，;0=默认;\n1=通用批量下载（类似IDM、迅雷）;\n2= IIIF manifest.json 自动检测下载图片")
 	flag.BoolVar(&Conf.Help, "h", false, "显示帮助")
 	flag.BoolVar(&Conf.Version, "v", false, "显示版本")
+
+	//rs
 	if string(os.PathSeparator) == "\\" {
-		flag.StringVar(&Conf.DezoomifyRs, "rs", "dezoomify-rs.exe", "自定义dezoomify-rs路径，例如：C:\\Windows\\System32\\dezoomify-rs.exe")
+		Conf.DezoomifyPath = "dezoomify-rs.exe"
+		if fi, err := os.Stat(dir + "\\dezoomify-rs.exe"); err == nil && fi.Size() > 0 {
+			Conf.DezoomifyPath = dir + "\\dezoomify-rs.exe"
+		}
+		flag.StringVar(&Conf.DezoomifyRs, "rs", "-l --compression 0", "dezoomify-rs 参数")
 	} else {
-		flag.StringVar(&Conf.DezoomifyRs, "rs", "dezoomify-rs", "自定义dezoomify-rs路径，例如：/usr/local/bin/dezoomify-rs")
+		Conf.DezoomifyPath = "dezoomify-rs"
+		if fi, err := os.Stat(dir + "\\dezoomify-rs"); err == nil && fi.Size() > 0 {
+			Conf.DezoomifyPath = dir + "/dezoomify-rs"
+		}
+		flag.StringVar(&Conf.DezoomifyRs, "rs", "-l --compression 0", "dezoomify-rs 参数")
 	}
+
 	flag.Parse()
 
 	k := len(os.Args)
