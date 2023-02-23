@@ -20,6 +20,7 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
 1. [中国][洛阳市图书馆](http://221.13.137.120:8090/index.php)
 1. [中国][温州市图书馆-瓯越记忆](https://oyjy.wzlib.cn/pdf/)
 1. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)
+1. [中国][北京故宫博物院-故宫名画记](https://minghuaji.dpm.org.cn/)
 
 ### 欧美数字图书馆：
 1. [美国][哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)
