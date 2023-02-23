@@ -2,6 +2,7 @@ package main
 
 import (
 	"bookget/config"
+	"bookget/site/China/bjdpm"
 	"bookget/site/China/cuhk"
 	"bookget/site/China/gzlib"
 	"bookget/site/China/idp"
@@ -333,6 +334,12 @@ func RegisterCommand() (err error) {
 	}
 	//040.江苏珍贵古籍数字图书馆
 	err = Site.RegisterCommand("218.2.105.121", jslib.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//041.北京故宫博物院-故宫名画记
+	err = Site.RegisterCommand("minghuaji.dpm.org.cn", bjdpm.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
