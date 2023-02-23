@@ -2,10 +2,10 @@ package loc
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
 	"bookget/lib/gohttp"
 	util2 "bookget/lib/util"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http/cookiejar"
@@ -59,14 +59,36 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 }
 
+func getBody(apiUrl string) ([]byte, error) {
+	jar, _ := cookiejar.New(nil)
+	cli := gohttp.NewClient(gohttp.Options{
+		CookieFile: config.Conf.CookieFile,
+		CookieJar:  jar,
+		Headers: map[string]interface{}{
+			"User-Agent": config.Conf.UserAgent,
+			"authority":  "www.loc.gov",
+			"origin":     "https://www.loc.gov",
+		},
+	})
+	resp, err := cli.Get(apiUrl)
+	if err != nil {
+		return nil, err
+	}
+	bs, _ := resp.GetBody()
+	if bs == nil {
+		err = errors.New(resp.GetReasonPhrase())
+		return nil, err
+	}
+	return bs, nil
+}
+
 func getPages(bookId string) (pages []string) {
-	//读cookie
-	header, _ := curl2.GetHeaderFile(config.Conf.CookieFile)
-	var manifests = new(ManifestsJson)
-	bs, err := curl2.Get(fmt.Sprintf("https://www.loc.gov/item/%s/?fo=json", bookId), header)
+	apiUrl := fmt.Sprintf("https://www.loc.gov/item/%s/?fo=json", bookId)
+	bs, err := getBody(apiUrl)
 	if err != nil {
 		return
 	}
+	var manifests = new(ManifestsJson)
 	if err = json.Unmarshal(bs, manifests); err != nil {
 		log.Printf("json.Unmarshal failed: %s\n", err)
 		return
@@ -106,7 +128,7 @@ func getImagePage(fileUrls []ImageFile, newWidth string) (downloadUrl string, ok
 				break
 			}
 		} else if f.Mimetype != "image/jpeg" {
-			if config.Conf.UseCDN == 1 {
+			if !config.Conf.UseCDN {
 				downloadUrl = strings.Replace(f.Url, "https://tile.loc.gov/storage-services/", "http://140.147.239.202/", 1)
 			} else {
 				downloadUrl = f.Url

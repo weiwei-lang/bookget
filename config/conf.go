@@ -22,7 +22,7 @@ type Input struct {
 	// ;0 = 禁用，1=启用 （只对支持的图书馆有效）
 	UseNumericFilename int    //下载文件名，是否只使用数字序号？0=否，1=是（目前只对国图生效）
 	FullImageWidth     int    //;全高清图下载时，指定宽度像素（16开纸185mm*260mm，像素2185*3071）
-	UseCDN             int    //是否使用CDN加速？ 1=是，0=否（目前仅美国国会图书馆 下载的图片类型JP2生效）
+	UseCDN             bool   //是否使用CDN加速？ 1=是，0=否（目前仅美国国会图书馆 下载的图片类型JP2生效）
 	UserAgent          string //自定义UserAgent
 	AutoDetect         int    //自动检测下载URL。可选值[0|1|2]，;0=默认;1=通用批量下载（类似IDM、迅雷）;2= IIIF manifest.json 自动检测下载图片
 	MergePDFs          int    //;台北故宫博物院 - 善本古籍，是否整册合并一个PDF下载？0=否，1=是。整册合并一个PDF遇到某一册最后一章节【无影像】会导致下载失败。 如：新刊校定集注杜詩 三十六卷 第二十四冊 聞惠子過東溪 无影像
@@ -48,7 +48,7 @@ func Init(ctx context.Context) bool {
 	flag.IntVar(&Conf.UseNumericFilename, "fn", 1, "保存文件名规则。可选值[0|1]。0=中文名，1=数字名。仅对 read.nlc.cn 有效。")
 	flag.StringVar(&Conf.UserAgent, "ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0", "user-agent")
 	flag.IntVar(&Conf.MergePDFs, "mp", 0, "合并PDF文件下载，可选值[0|1]。0=否，1=是。仅对 rbk-doc.npm.edu.tw 有效。")
-	flag.IntVar(&Conf.UseCDN, "cdn", 0, "使用CDN加速，可选值[0|1]。0=否，1=是。仅对 www.loc.gov 有效。")
+	flag.BoolVar(&Conf.UseCDN, "cdn", true, "使用CDN加速，可选值[0|1]。0=否，1=是。仅对 www.loc.gov 有效。")
 	flag.StringVar(&Conf.CookieFile, "c", "", "指定cookie.txt文件路径")
 	flag.StringVar(&Conf.FileExt, "ext", ".jpg", "指定文件扩展名[.jpg|.tif|.png]等")
 	c := uint(runtime.NumCPU() * 2)
