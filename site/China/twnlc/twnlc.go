@@ -2,8 +2,8 @@ package twnlc
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	"bookget/lib/curl"
+	"bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -25,10 +25,10 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
-	bs, cookies, err := curl2.GetWithCookie(taskUrl, nil)
+	bs, cookies, err := curl.GetWithCookie(taskUrl, nil)
 	if err != nil {
 		return
 	}
@@ -43,13 +43,13 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	//循环下载图片
 	ext := ".jpg"
 	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
+	i := util.LoopIndexStart(canvases.Size)
 	for ; i < canvases.Size; i++ {
 		u := canvases.ImgUrls[i]
 		if u == "" {
 			continue
 		}
-		sortId := util2.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, u)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
@@ -59,7 +59,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		}
 		token := getToken(requestVerificationToken, cookies)
 		imgurl := fmt.Sprintf("https://rbook.ncl.edu.tw%s&token=%s", u, token)
-		curl2.FastGet(imgurl, dest, nil, false)
+		curl.FastGet(imgurl, dest, nil, false)
 	}
 	return
 }
@@ -95,8 +95,8 @@ func getToken(requestVerificationToken string, cookies []*http.Cookie) string {
 	data := "__RequestVerificationToken=" + requestVerificationToken
 
 	header := make(map[string]string)
-	header["Cookie"] = curl2.HttpCookie2String(cookies)
-	bs, err := curl2.Post(uri, []byte(data), header)
+	header["Cookie"] = curl.HttpCookie2String(cookies)
+	bs, err := curl.Post(uri, []byte(data), header)
 	if err != nil {
 		return ""
 	}

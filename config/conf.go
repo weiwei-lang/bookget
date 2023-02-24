@@ -17,6 +17,7 @@ type Input struct {
 	CookieFile string //输入cookie.txt
 	PageSeq    int    //多图，从第几个开始（只对下载是多张图片的图书馆有效）
 	Volume     int    //多册，只下第N册
+	Speed      uint   //限速
 	SaveFolder string //下载文件存放目录，默认为当前文件夹下 Downloads 目录下
 	//;生成 dezoomify-rs 可用的文件(默认生成文件名 dezoomify-rs.urls.txt）
 	// ;0 = 禁用，1=启用 （只对支持的图书馆有效）
@@ -53,6 +54,7 @@ func Init(ctx context.Context) bool {
 	flag.StringVar(&Conf.FileExt, "ext", ".jpg", "指定文件扩展名[.jpg|.tif|.png]等")
 	c := uint(runtime.NumCPU() * 2)
 	flag.UintVar(&Conf.Threads, "n", c, "最大并发连接数")
+	flag.UintVar(&Conf.Speed, "speed", 5, "下载限速 N 秒/任务，cuhk推荐5-60")
 	flag.IntVar(&Conf.AutoDetect, "a", 0, "自动检测下载URL。可选值[0|1|2]，;0=默认;\n1=通用批量下载（类似IDM、迅雷）;\n2= IIIF manifest.json 自动检测下载图片")
 	flag.BoolVar(&Conf.Help, "h", false, "显示帮助")
 	flag.BoolVar(&Conf.Version, "v", false, "显示版本")
@@ -93,7 +95,9 @@ func Init(ctx context.Context) bool {
 		Conf.UrlsFile = dir + string(os.PathSeparator) + Conf.UrlsFile
 	}
 	//fmt.Printf("%+v", Conf)
-
+	if Conf.Speed > 60 {
+		Conf.Speed = 60
+	}
 	//保存目录处理
 	_ = os.Mkdir(Conf.SaveFolder, os.ModePerm)
 

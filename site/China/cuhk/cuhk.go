@@ -2,15 +2,17 @@ package cuhk
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	"bookget/lib/curl"
+	"bookget/lib/util"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
@@ -31,7 +33,7 @@ func getBookId(bookUrl string) (bookId string) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	bookUrls := getMultiplebooks(taskUrl)
 	if bookUrls == nil || len(bookUrls) == 0 {
@@ -43,53 +45,61 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	for i := 0; i < size; i++ {
 		uri := bookUrls[i]
 		log.Printf("Test volume %d ... \n", i+1)
-		id := fmt.Sprintf("%s.%s", bookId, util2.GenNumberSorted(i+1))
-		config.CreateDirectory(uri, bookId)
+		id := fmt.Sprintf("%s_volume%s", bookId, util.GenNumberSorted(i+1))
+		config.CreateDirectory(uri, id)
 		do(id, uri)
 	}
 }
 
 func do(bookId, bookUrl string) {
-	iiifUri, manifest, useToken, cookies := getImageUrls(bookUrl)
-	if manifest == nil {
+	imagePages, cookies := getJpg2000Urls(bookUrl)
+	if imagePages == nil {
 		log.Printf("Not found URL.")
 		return
 	}
-	//用户自定义起始页
-	size := len(manifest.Pages)
-	i := util2.LoopIndexStart(size)
+	size := len(imagePages)
 	log.Printf(" %d pages.\n", size)
-	//访问带cookie
-	sCookie := curl2.HttpCookie2String(cookies)
-	for ; i < size; i++ {
-		page := manifest.Pages[i]
-		imgUrl := fmt.Sprintf("%s/%s/full/full/0/default.jpg", iiifUri, page.Identifier)
-		ext := util2.FileExt(imgUrl)
-		sortId := util2.GenNumberSorted(i + 1)
+	sCookie := curl.HttpCookie2String(cookies)
+	for i, v := range imagePages {
+		imgUrl := formateUrl(v.Pid)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, imgUrl)
 
-		filename := sortId + ext
+		filename := sortId + ".jp2"
 		dest := config.GetDestPath(bookUrl, bookId, filename)
 
-		header := make(map[string]string, 2)
+		header := make(map[string]string, 8)
 		header["Cookie"] = sCookie
 		header["Referer"] = bookUrl
-		if useToken {
-			header["X-ISLANDORA-TOKEN"] = page.Token
+		if v.Token != "" {
+			header["X-ISLANDORA-TOKEN"] = v.Token
 		}
-		curl2.FastGet(imgUrl, dest, header, true)
+		curl.FastGet(imgUrl, dest, header, true)
+
+		if config.Conf.Speed > 0 {
+			for t := config.Conf.Speed; t > 0; t-- {
+				seconds := strconv.Itoa(int(t))
+				if t < 10 {
+					seconds = fmt.Sprintf("0%d", t)
+				}
+				fmt.Printf("\rplease wait.... [00:%s of appr. Max %d sec]", seconds, config.Conf.Speed)
+				time.Sleep(time.Second)
+			}
+			fmt.Println()
+		}
 	}
 }
 
 func getMultiplebooks(bookUrl string) (uri []string) {
-	bs, err := curl2.Get(bookUrl, nil)
+	bs, err := curl.Get(bookUrl, nil)
 	if err != nil {
 		return
 	}
 	text := string(bs)
-	subText := util2.SubText(text, "id=\"block-islandora-compound-object-compound-navigation-select-list\"", "id=\"book-viewer\">")
+	subText := util.SubText(text, "id=\"block-islandora-compound-object-compound-navigation-select-list\"", "id=\"book-viewer\">")
 	matches := regexp.MustCompile(`value=['"]([A-z\d:_-]+)['"]`).FindAllStringSubmatch(subText, -1)
 	if matches == nil {
+		uri = append(uri, bookUrl)
 		return
 	}
 	for _, m := range matches {
@@ -103,27 +113,11 @@ func getMultiplebooks(bookUrl string) (uri []string) {
 	return
 }
 
-func getImageUrls(bookUrl string) (iiifUri string, manifest *iiifManifest, useToken bool, cookies []*http.Cookie) {
-	bs, c, err := curl2.GetWithCookie(bookUrl, nil)
-	if err != nil {
-		return
-	}
-	text := string(bs)
-	iiifUri = getIiifUri(&text)
-	useToken = getTokenHeader(&text)
-	bsPage := getBody(&text)
-	manifest = new(iiifManifest)
-	if err = json.Unmarshal(bsPage, manifest); err != nil {
-		log.Printf("json.Unmarshal failed: %s\n", err)
-		return
-	}
-	return iiifUri, manifest, useToken, c
-}
-
 // header.Set("X-ISLANDORA-TOKEN")
-func getTokenHeader(text *string) bool {
+func getTokenHeader(text string) bool {
+	return true //TODO
 	useToken := false
-	matchToken := regexp.MustCompile(`"tokenHeader":([a-zA-z]+)`).FindStringSubmatch(*text)
+	matchToken := regexp.MustCompile(`"tokenHeader":([a-zA-z]+)`).FindStringSubmatch(text)
 	if matchToken != nil {
 		//请求头信息是否包含token
 		if strings.ToLower(matchToken[1]) == "true" {
@@ -133,22 +127,26 @@ func getTokenHeader(text *string) bool {
 	return useToken
 }
 
-func getIiifUri(text *string) string {
-	// 还有一种方式，不用cookie可以下载JP2
-	//https://repository.lib.cuhk.edu.hk/en/islandora/object/cuhk%3A412226/datastream/JP2/view/
-	match := regexp.MustCompile(`"iiifUri":"([^"]+)"`).FindStringSubmatch(*text)
-	iiifUri := ""
-	if match != nil {
-		iiifUri = "https://repository.lib.cuhk.edu.hk" + strings.ReplaceAll(match[1], "\\/", "/")
-	}
-	return iiifUri
-}
-
-func getBody(text *string) (bs []byte) {
-	matches := regexp.MustCompile(`"pages":([^]]+)]`).FindStringSubmatch(*text)
-	if matches == nil {
+func getJpg2000Urls(bookUrl string) (imagePage []ImagePage, c []*http.Cookie) {
+	bs, c, err := curl.GetWithCookie(bookUrl, nil)
+	if err != nil {
 		return
 	}
-	sText := []byte("{\"pages\":" + matches[1] + "]}")
-	return sText
+	var resp ResponsePage
+	matches := regexp.MustCompile(`"pages":([^]]+)]`).FindSubmatch(bs)
+	if matches != nil {
+		imagePage = make([]ImagePage, len(matches[1]))
+		data := []byte("{\"pages\":" + string(matches[1]) + "]}")
+		if err = json.Unmarshal(data, &resp); err != nil {
+			log.Printf("json.Unmarshal failed: %s\n", err)
+		}
+		copy(imagePage, resp.ImagePage)
+	}
+	return imagePage, c
+}
+
+func formateUrl(id string) string {
+	template := "https://repository.lib.cuhk.edu.hk/islandora/object/%s/datastream/JP2"
+	//imgUrl := fmt.Sprintf("https://repository.lib.cuhk.edu.hk/%s/full/full/0/default.jpg", page.Identifier)
+	return fmt.Sprintf(template, id)
 }

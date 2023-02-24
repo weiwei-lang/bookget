@@ -1,10 +1,10 @@
 package cuhk
 
-type iiifManifest struct {
-	Pages []Page `json:"pages"`
+type ResponsePage struct {
+	ImagePage []ImagePage `json:"pages"`
 }
 
-type Page struct {
+type ImagePage struct {
 	Pid        string `json:"pid"`
 	Page       string `json:"page"`
 	Label      string `json:"label"`
