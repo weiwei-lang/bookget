@@ -297,6 +297,7 @@ func RegisterCommand() (err error) {
 	}
 	//035.广州大典
 	err = Site.RegisterCommand("gzdd.gzlib.gov.cn", gzlib.Init)
+	err = Site.RegisterCommand("gzdd.gzlib.org.cn", gzlib.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -340,6 +341,7 @@ func RegisterCommand() (err error) {
 	}
 	//041.北京故宫博物院-故宫名画记
 	err = Site.RegisterCommand("minghuaji.dpm.org.cn", bjdpm.Init)
+	err = Site.RegisterCommand("m-minghuaji.dpm.org.cn", bjdpm.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

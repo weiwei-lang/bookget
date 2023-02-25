@@ -41,7 +41,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	log.Printf("Get %s  %s\n", name, dt.Url)
 
 	header, _ := curl.GetHeaderFile(config.Conf.CookieFile)
-	pdfUrl, err := getPdfUrl(dt.BookId, config.Conf.CookieFile)
+	pdfUrl, err := getPdfUrl(dt, config.Conf.CookieFile)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -86,11 +86,9 @@ func getBookId(text string) string {
 	return bookId
 }
 
-func getPdfUrl(bookId, cookieFile string) (string, error) {
-	//cookie 处理
+func getPdfUrl(dt *DownloadTask, cookieFile string) (string, error) {
 	jar, _ := cookiejar.New(nil)
-	//header, _ := curl.GetHeaderFile(cookieFile)
-	apiUrl := fmt.Sprintf("http://gzdd.gzlib.gov.cn/Hrcanton/Search/ResultDetail?BookId=%s", bookId)
+	apiUrl := fmt.Sprintf("http://%s/Hrcanton/Search/ResultDetail?BookId=%s", dt.UrlParsed.Host, dt.BookId)
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: cookieFile,
 		CookieJar:  jar,
@@ -116,7 +114,7 @@ func getPdfUrl(bookId, cookieFile string) (string, error) {
 		pdfUrl += m[1]
 	}
 	if pdfUrl == "" {
-		pdfUrl = fmt.Sprintf("http://113.108.173.156/OnlineViewServer/onlineview.aspx?filename=%s.pdf", bookId)
+		pdfUrl = fmt.Sprintf("http://113.108.173.156/OnlineViewServer/onlineview.aspx?filename=%s.pdf", dt.BookId)
 	}
 	return pdfUrl, nil
 }
