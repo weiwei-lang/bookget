@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -151,7 +150,7 @@ func (r *Request) do() (*Response, error) {
 		_, err := resp.dlFile(dl)
 		resp.err = err
 	} else {
-		body, err := ioutil.ReadAll(_resp.Body)
+		body, err := io.ReadAll(_resp.Body)
 		resp.body = body
 		resp.err = err
 	}

@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -34,7 +33,7 @@ func main() {
 	//批量URLs
 	if config.Conf.UrlsFile != "" {
 		//加载配置文件
-		bs, err := ioutil.ReadFile(config.Conf.UrlsFile)
+		bs, err := os.ReadFile(config.Conf.UrlsFile)
 		if err != nil {
 			fmt.Println(err)
 			return
