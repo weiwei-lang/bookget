@@ -30,8 +30,8 @@ func getBookId(taskUrl string) string {
 }
 
 func StartDownload(pageUrl, bookId string) {
-	canvases := getCanvases(pageUrl)
-	if canvases.Size == 0 {
+	canvases, err := getCanvases(pageUrl)
+	if err != nil || canvases.Size == 0 {
 		return
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
@@ -63,7 +63,7 @@ func StartDownload(pageUrl, bookId string) {
 	}
 }
 
-func getCanvases(uri string) (canvases Canvases) {
+func getCanvases(uri string) (canvases Canvases, err error) {
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: config.Conf.CookieFile,
 		Headers: map[string]interface{}{
@@ -75,6 +75,10 @@ func getCanvases(uri string) (canvases Canvases) {
 		return
 	}
 	bs, _ := resp.GetBody()
+	return parseXml(bs)
+}
+
+func parseXml(bs []byte) (canvases Canvases, err error) {
 	var manifest = new(Manifest)
 	if err = json.Unmarshal(bs, manifest); err != nil {
 		log.Printf("json.Unmarshal failed: %s\n", err)
