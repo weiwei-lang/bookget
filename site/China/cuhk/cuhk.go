@@ -10,9 +10,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
-	"time"
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
@@ -75,18 +73,7 @@ func do(bookId, bookUrl string) {
 			header["X-ISLANDORA-TOKEN"] = v.Token
 		}
 		curl.FastGet(imgUrl, dest, header, true)
-
-		if config.Conf.Speed > 0 {
-			for t := config.Conf.Speed; t > 0; t-- {
-				seconds := strconv.Itoa(int(t))
-				if t < 10 {
-					seconds = fmt.Sprintf("0%d", t)
-				}
-				fmt.Printf("\rplease wait.... [00:%s of appr. Max %d sec]", seconds, config.Conf.Speed)
-				time.Sleep(time.Second)
-			}
-			fmt.Println()
-		}
+		util.PrintSleepTime(config.Conf.Speed)
 	}
 }
 
@@ -135,11 +122,11 @@ func getJpg2000Urls(bookUrl string) (imagePage []ImagePage, c []*http.Cookie) {
 	var resp ResponsePage
 	matches := regexp.MustCompile(`"pages":([^]]+)]`).FindSubmatch(bs)
 	if matches != nil {
-		imagePage = make([]ImagePage, len(matches[1]))
 		data := []byte("{\"pages\":" + string(matches[1]) + "]}")
 		if err = json.Unmarshal(data, &resp); err != nil {
 			log.Printf("json.Unmarshal failed: %s\n", err)
 		}
+		imagePage = make([]ImagePage, len(resp.ImagePage))
 		copy(imagePage, resp.ImagePage)
 	}
 	return imagePage, c

@@ -2,8 +2,8 @@ package rbkdocnpmtw
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"math/rand"
@@ -14,7 +14,7 @@ import (
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
-	bs, err := curl2.Get(taskUrl, nil)
+	bs, err := curl.Get(taskUrl, nil)
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +47,7 @@ func getBookId(text string) string {
 }
 
 func StartDownload(iTask int, taskUrl, bookId, text string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	links := getVolumeUrls(text)
 	if links == nil {
@@ -57,12 +57,7 @@ func StartDownload(iTask int, taskUrl, bookId, text string) {
 	var canvases Canvases
 	canvases.ImgUrls = make([]string, 0, size)
 
-	//用户自定义起始页
-	k := util2.LoopIndexStart(size)
 	for j, link := range links {
-		if j <= k {
-			continue
-		}
 		if j > 0 {
 			fmt.Printf("\r Test volume %d ... ", j)
 		}
@@ -76,17 +71,16 @@ func StartDownload(iTask int, taskUrl, bookId, text string) {
 		return
 	}
 	ext := ".pdf"
-	for i := 0; i < canvases.Size; i++ {
-		uri := canvases.ImgUrls[i] //从0开始
+	for i, uri := range canvases.ImgUrls {
 		if uri == "" {
 			continue
 		}
-		sortId := util2.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 
 		filename := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, filename)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 	return
 }
@@ -122,7 +116,7 @@ func getVolumeUrls(text string) (links []string) {
 }
 
 func getImageUrls(uri string) (imgUrls []string) {
-	bs, err := curl2.Get(uri, nil)
+	bs, err := curl.Get(uri, nil)
 	if err != nil {
 		return
 	}
@@ -191,7 +185,7 @@ func getIdSecu(text string) (id string, sec string, tphc string) {
 func getLoginForm() (id string, sec string, tphc string) {
 	rand.Seed(time.Now().Unix())
 	uri := fmt.Sprintf("https://rbk-doc.npm.edu.tw/npmtpc/npmtpall?@@%d", rand.Int())
-	bs, err := curl2.GetRedirects(uri, nil, 3)
+	bs, err := curl.GetRedirects(uri, nil, 3)
 	if err != nil {
 		return
 	}

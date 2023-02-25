@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"net/http/cookiejar"
@@ -17,7 +17,7 @@ import (
 // 家谱图像 https://www.familysearch.org/records/images/
 func ImagesDownload(t *Downloader) (msg string, err error) {
 
-	name := util2.GenNumberSorted(t.Index)
+	name := util.GenNumberSorted(t.Index)
 	log.Printf("Get %s  %s\n", name, t.Url)
 
 	canvases, err := getCanvases(t.BookId, config.Conf.CookieFile)
@@ -30,15 +30,12 @@ func ImagesDownload(t *Downloader) (msg string, err error) {
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
 	header, _ := curl.GetHeaderFile(config.Conf.CookieFile)
-	util2.CreateShell(t.SavePath, canvases.IiifUrls, header)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		dUrl := canvases.ImageUrls[i] //从0开始
+	util.CreateShell(t.SavePath, canvases.IiifUrls, header)
+	for i, dUrl := range canvases.ImageUrls {
 		if dUrl == "" {
 			continue
 		}
-		sortId := util2.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
 		fileName := sortId + ".jpg"
 		dest := config.GetDestPath(t.Url, t.BookId, fileName)

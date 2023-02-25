@@ -2,54 +2,64 @@ package usthk
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	"bookget/lib/curl"
+	"bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
+	"strings"
 )
 
-func Init(iTask int, taskUrl string) (msg string, err error) {
-	bookId := ""
-	m := regexp.MustCompile(`bib/([A-z0-9]+)`).FindStringSubmatch(taskUrl)
-	if m != nil {
-		bookId = m[1]
-		config.CreateDirectory(taskUrl, bookId)
-		StartDownload(iTask, taskUrl, bookId)
-	}
-	return "", err
+func Init(iTask int, sUrl string) (msg string, err error) {
+	dt := new(DownloadTask)
+	dt.UrlParsed, err = url.Parse(sUrl)
+	dt.Url = sUrl
+	dt.Index = iTask
+	return Download(dt)
 }
 
-func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
-	log.Printf("Get %s  %s\n", name, taskUrl)
-	canvases := getImageUrls(taskUrl)
-	log.Printf(" %d pages.\n", canvases.Size)
-	if canvases.ImgUrls == nil {
-		return
+func getBookId(text string) string {
+	text = strings.ToLower(text)
+	bookId := ""
+	m := regexp.MustCompile(`bib/([A-z0-9_-]+)`).FindStringSubmatch(text)
+	if m != nil {
+		bookId = m[1]
 	}
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		uri := (*canvases.ImgUrls)[i] //从0开始
+	return bookId
+}
+
+func Download(dt *DownloadTask) (msg string, err error) {
+	dt.BookId = getBookId(dt.Url)
+	if dt.BookId == "" {
+		return "", err
+	}
+	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
+
+	name := util.GenNumberSorted(dt.Index)
+	log.Printf("Get %s  %s\n", name, dt.Url)
+
+	canvases := getCanvases(dt)
+	log.Printf(" %d pages.\n", canvases.Size)
+	for i, uri := range canvases.ImgUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 
 		fileName := sortId + ext
-		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		dest := config.GetDestPath(dt.Url, dt.BookId, fileName)
+		curl.FastGet(uri, dest, nil, true)
 	}
 
 	return
 }
 
-func getImageUrls(taskUrl string) (canvases Canvases) {
-	bs, err := curl2.Get(taskUrl, nil)
+func getCanvases(dt *DownloadTask) (canvases Canvases) {
+	bs, err := curl.Get(dt.Url, nil)
 	if err != nil {
 		return
 	}
@@ -63,23 +73,23 @@ func getImageUrls(taskUrl string) (canvases Canvases) {
 	imgUrls := make([]string, 0, 1000)
 	for _, m := range matches {
 		sPath := m[1]
-		uri := fmt.Sprintf("https://lbezone.ust.hk/bookreader/getfilelist.php?path=%s", sPath)
-		bs, err = curl2.Get(uri, nil)
+		uri := fmt.Sprintf("https://%s/bookreader/getfilelist.php?path=%s", dt.UrlParsed.Host, sPath)
+		bs, err = curl.Get(uri, nil)
 		if err != nil {
 			return
 		}
-		result := new(Result)
-		if err = json.Unmarshal(bs, result); err != nil {
+		respFiles := new(ResponseFiles)
+		if err = json.Unmarshal(bs, respFiles); err != nil {
 			log.Printf("json.Unmarshal failed: %s\n", err)
 			return
 		}
 		//imgUrls := make([]string, 0, len(result.FileList))
-		for _, v := range result.FileList {
-			imgUrl := fmt.Sprintf("https://lbezone.ust.hk/obj/%s/%s", sPath, v)
+		for _, v := range respFiles.FileList {
+			imgUrl := fmt.Sprintf("https://%s/obj/%s/%s", dt.UrlParsed.Host, sPath, v)
 			imgUrls = append(imgUrls, imgUrl)
 		}
 	}
-	canvases.ImgUrls = &imgUrls
+	canvases.ImgUrls = imgUrls
 	canvases.Size = len(imgUrls)
 	return
 }

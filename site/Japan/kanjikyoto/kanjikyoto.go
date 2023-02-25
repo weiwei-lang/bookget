@@ -2,8 +2,8 @@ package kanjikyoto
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"regexp"
@@ -24,7 +24,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	bookUrls, err := getMultiplebooks(taskUrl)
@@ -32,31 +32,28 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	size := len(bookUrls)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
-	imageUrls, e := getImages(bookUrls[size-1], i+1)
+	imageUrls, e := getImages(bookUrls[size-1])
 	if e != nil {
 		return
 	}
 	size = len(imageUrls)
 	log.Printf(" %d pages.\n", size)
-	for ; i < size; i++ {
-		uri := imageUrls[i] //从0开始
+	for i, uri := range imageUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 	return
 }
 
 func getMultiplebooks(taskUrl string) (bookUrls []string, err error) {
-	bs, err := curl2.Get(taskUrl, nil)
+	bs, err := curl.Get(taskUrl, nil)
 	if err != nil {
 		return
 	}
@@ -80,8 +77,8 @@ func getMultiplebooks(taskUrl string) (bookUrls []string, err error) {
 	return links, err
 }
 
-func getImages(volumeUrl string, startPage int) (imageUrls []string, err error) {
-	bs, err := curl2.Get(volumeUrl, nil)
+func getImages(volumeUrl string) (imageUrls []string, err error) {
+	bs, err := curl.Get(volumeUrl, nil)
 	if err != nil {
 		return
 	}
@@ -107,12 +104,11 @@ func getImages(volumeUrl string, startPage int) (imageUrls []string, err error) 
 	pos1 := strings.LastIndex(volumeUrl[:pos], "/")
 	hostUrl := volumeUrl[:pos1]
 	maxPos := startPos + maxPage
-	for i := startPage; i < maxPos; i++ {
-		sortId := util2.GenNumberSorted(i)
+	for i := 1; i < maxPos; i++ {
+		sortId := util.GenNumberSorted(i)
 		imgUrl := fmt.Sprintf("%s/L/%s%s.jpg", hostUrl, bookNumber, sortId)
 		imageUrls = append(imageUrls, imgUrl)
 	}
-
 	return
 }
 func getBookNumber(text *string) (bookNumber string, ok bool) {

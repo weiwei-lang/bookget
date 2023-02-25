@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"regexp"
@@ -30,7 +30,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	pdfUrls, size := getMultiplebooks(taskUrl)
@@ -39,15 +39,12 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", size)
 
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		uri := (*pdfUrls)[i] //从0开始
+	for i, uri := range pdfUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
@@ -62,7 +59,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 }
 
-func getMultiplebooks(bookUrl string) (pdfUrls *[]string, size int) {
+func getMultiplebooks(bookUrl string) (pdfUrls []string, size int) {
 	bs, err := curl.Get(bookUrl, nil)
 	if err != nil {
 		return
@@ -78,12 +75,11 @@ func getMultiplebooks(bookUrl string) (pdfUrls *[]string, size int) {
 		ids = append(ids, match[1])
 	}
 	sort.Sort(strs(ids))
-	links := make([]string, 0, len(ids))
+	pdfUrls = make([]string, 0, len(ids))
 	for _, v := range ids {
 		s := fmt.Sprintf("%s%s.pdf", bookUrl, v)
-		links = append(links, s)
+		pdfUrls = append(pdfUrls, s)
 	}
-	pdfUrls = &links
-	size = len(links)
+	size = len(pdfUrls)
 	return
 }

@@ -218,7 +218,7 @@ func RegisterCommand() (err error) {
 		return
 	}
 	//022.香港科技大学图书馆
-	err = Site.RegisterCommand("lbezone.ust.hk", usthk.Init)
+	err = Site.RegisterCommand("lbezone.hkust.edu.hk", usthk.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -2,8 +2,8 @@ package nlc
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,7 +15,7 @@ import (
 
 func Init(iTask int, sUrl string) (msg string, err error) {
 	dt := new(DownloadTask)
-	dt.Domain = util2.GetHostUrl(sUrl)
+	dt.Domain = util.GetHostUrl(sUrl)
 	dt.Url = sUrl
 	dt.Index = iTask
 	return Download(dt)
@@ -24,7 +24,7 @@ func Init(iTask int, sUrl string) (msg string, err error) {
 func Download(dt *DownloadTask) (msg string, err error) {
 	//单册
 	if strings.Contains(dt.Url, "OpenObjectBook") {
-		bs, err := curl2.Get(dt.Url, nil)
+		bs, err := curl.Get(dt.Url, nil)
 		if err != nil {
 			fmt.Printf("Error ID: %s\n", dt.Url)
 			return "", err
@@ -55,10 +55,10 @@ func getBookId(text string) string {
 }
 
 func fetchBooks(dt *DownloadTask) (msg string, err error) {
-	name := util2.GenNumberSorted(dt.Index)
+	name := util.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
 
-	bs, err := curl2.Get(dt.Url, nil)
+	bs, err := curl.Get(dt.Url, nil)
 	if err != nil {
 		return
 	}
@@ -72,9 +72,9 @@ func fetchBooks(dt *DownloadTask) (msg string, err error) {
 	//用户自定义起始页
 	size := len(pdfUrls)
 	log.Printf(" %d PDFs.\n", size)
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		if pdfUrls[i][1] == "" {
+
+	for i, uri := range pdfUrls {
+		if uri[1] == "" {
 			continue
 		}
 		pdfUrl := fmt.Sprintf("%sOutOpenBook/%s", dt.Domain, pdfUrls[i][1])
@@ -84,7 +84,7 @@ func fetchBooks(dt *DownloadTask) (msg string, err error) {
 }
 
 func fetchOneBook(i int, sUrl string, dt *DownloadTask) {
-	sortId := util2.GenNumberSorted(i)
+	sortId := util.GenNumberSorted(i)
 	log.Printf("Get %s  %s\n", sortId, sUrl)
 
 	//解析URL
@@ -125,7 +125,7 @@ func fetchOneBook(i int, sUrl string, dt *DownloadTask) {
 	header["Range"] = "bytes=0-1"
 	header["Referer"] = fmt.Sprintf("%sstatic/webpdf/lib/WebPDFJRWorker.js", dt.Domain)
 
-	curl2.FastGet(pdfUrl, dest, header, false)
+	curl.FastGet(pdfUrl, dest, header, false)
 }
 
 func getVolumeTitle(id, indexName, domain string) string {
@@ -134,7 +134,7 @@ func getVolumeTitle(id, indexName, domain string) string {
 	//{"success":true,"msg":"","obj":[{"chapter_name2":"經濟彙編戎政典","chapter_name1":"經濟彙編戎政典","chapter_num1":"第一百四十五卷","chapter_num2":"第一百四十六卷"}]}
 	sUrl := fmt.Sprintf("%sallSearch/formatCatalog", domain)
 	var cata = new(Catalog)
-	bs, err := curl2.Post(sUrl, []byte(dataRaw), nil)
+	bs, err := curl.Post(sUrl, []byte(dataRaw), nil)
 	if err != nil {
 		return ""
 	}
@@ -145,9 +145,9 @@ func getVolumeTitle(id, indexName, domain string) string {
 	if cata.Obj == nil || len(cata.Obj) == 0 {
 		cnNumber := strings.Replace(LastChapter.ChapterNum2, "第", "", 1)
 		cnNumber = strings.Replace(cnNumber, "卷", "", 1)
-		numInt := util2.ChineseToNumber(cnNumber)
+		numInt := util.ChineseToNumber(cnNumber)
 		numInt++
-		var chapterNum2 = util2.NumberToChinese(int64(numInt))
+		var chapterNum2 = util.NumberToChinese(int64(numInt))
 		chapterNum2 = "第" + chapterNum2 + "卷"
 		text += LastChapter.ChapterName2 + "." + chapterNum2
 
@@ -179,7 +179,7 @@ func getVolumeTitle(id, indexName, domain string) string {
 }
 
 func getToken(uri string) (tokenKey, timeKey, timeFlag string) {
-	body, err := curl2.Get(uri, nil)
+	body, err := curl.Get(uri, nil)
 	if err != nil {
 		log.Printf("Server unavailable: %s", err.Error())
 		return

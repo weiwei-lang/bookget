@@ -3,7 +3,7 @@ package berlin
 import (
 	"bookget/config"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,7 +11,7 @@ import (
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
-	taskName := util2.GenNumberSorted(iTask)
+	taskName := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", taskName, taskUrl)
 	bookId := getBookId(taskUrl)
 	config.CreateDirectory(taskUrl, bookId)
@@ -36,17 +36,11 @@ func StartDownload(pageUrl, bookId string) {
 	log.Printf(" %d pages.\n", canvases.Size)
 
 	destPath := config.CreateDirectory(pageUrl, bookId)
-	util2.CreateShell(destPath, canvases.IiifUrls, nil)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
+	util.CreateShell(destPath, canvases.IiifUrls, nil)
 
-	for ; i < canvases.Size; i++ {
-		uri := canvases.ImgUrls[i] //从0开始
-		if uri == "" {
-			continue
-		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+	for i, uri := range canvases.ImgUrls {
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		filename := sortId + ext
 		dest := config.GetDestPath(pageUrl, bookId, filename)

@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -27,25 +27,21 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(num int, uri, bookId string) {
-	name := util2.GenNumberSorted(num)
+	name := util.GenNumberSorted(num)
 	log.Printf("Get %s  %s\n", name, uri)
 
 	pages, iiifInfo := getPages(uri)
 	log.Printf(" %d pages.\n", len(pages))
 
 	destPath := config.CreateDirectory(uri, bookId)
-	util2.CreateShell(destPath, iiifInfo, nil)
+	util.CreateShell(destPath, iiifInfo, nil)
 
-	//用户自定义起始页
-	size := len(pages)
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		imgUri := pages[i] //从0开始
+	for i, imgUri := range pages {
 		if imgUri == "" {
 			continue
 		}
-		ext := util2.FileExt(imgUri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(imgUri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, imgUri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(uri, bookId, fileName)

@@ -3,7 +3,7 @@ package idp
 import (
 	"bookget/config"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"net/http/cookiejar"
@@ -38,15 +38,12 @@ func StartDownload(dt *DownloadTask) (msg string, err error) {
 	log.Printf(" %d pages.\n", canvases.Size)
 
 	config.CreateDirectory(dt.Url, dt.BookId)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
 	ext := ".jpg"
-	for ; i < canvases.Size; i++ {
-		dUrl := canvases.ImgUrls[i] //从0开始
+	for i, dUrl := range canvases.ImgUrls {
 		if dUrl == "" {
 			continue
 		}
-		sortId := util2.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
 		filename := sortId + ext
 		dest := config.GetDestPath(dt.Url, dt.BookId, filename)

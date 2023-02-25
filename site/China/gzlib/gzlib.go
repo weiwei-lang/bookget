@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"net/http/cookiejar"
@@ -37,7 +37,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	}
 	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
 
-	name := util2.GenNumberSorted(dt.Index)
+	name := util.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
 
 	header, _ := curl.GetHeaderFile(config.Conf.CookieFile)
@@ -48,7 +48,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	}
 
 	log.Printf("Get %d  %s\n", dt.Index, pdfUrl)
-	ext := util2.FileExt(pdfUrl)
+	ext := util.FileExt(pdfUrl)
 	dest := config.GetDestPath(dt.Url, dt.BookId, dt.BookId+ext)
 
 	fi, err := os.Stat(dest)

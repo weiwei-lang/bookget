@@ -2,8 +2,8 @@ package national
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"os"
@@ -22,22 +22,19 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	bookIds, size := getMultiplebooks(bookId)
 	if bookIds == nil || size == 0 {
 		return
 	}
 	log.Printf("\n %d files.\n", size)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		id := (*bookIds)[i] //从0开始
+	for i, id := range bookIds {
 		if id == "" {
 			continue
 		}
 		ext := ".zip"
-		sortId := util2.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i + 1)
 		extId := "pdf"
 		switch config.Conf.FileExt {
 		case ".jpg":
@@ -56,10 +53,10 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 
 }
-func getMultiplebooks(bookId string) (bookIDs *[]string, size int) {
+func getMultiplebooks(bookId string) (bookIDs []string, size int) {
 	//https://www.digital.archives.go.jp/DAS/meta/listPhoto?LANG=default&BID=F1000000000000095447&ID=&NO=&TYPE=dljpeg&DL_TYPE=jpeg
 	downPage := fmt.Sprintf("https://www.digital.archives.go.jp/DAS/meta/listPhoto?LANG=default&BID=%s&ID=&NO=&TYPE=dljpeg&DL_TYPE=jpeg", bookId)
-	bs, err := curl2.Get(downPage, nil)
+	bs, err := curl.Get(downPage, nil)
 	if err != nil {
 		return
 	}
@@ -71,16 +68,15 @@ func getMultiplebooks(bookId string) (bookIDs *[]string, size int) {
 		return
 	}
 	iLen := len(matches)
-	ids := make([]string, 0)
+	bookIDs = make([]string, 0)
 	for _, match := range matches {
 		//跳过全选复选框
 		if iLen > 1 && (match[1] == "0" || match[2] == "") {
 			continue
 		}
-		ids = append(ids, match[2])
+		bookIDs = append(bookIDs, match[2])
 	}
-	bookIDs = &ids
-	size = len(ids)
+	size = len(bookIDs)
 	return
 }
 
@@ -97,6 +93,6 @@ func download(bookId, id string, dest string, sortId string) (size int64, err er
 	}
 
 	dataRaw := fmt.Sprintf("DL_TYPE=%s&id_1=%s&page_1=", extId, id)
-	size, err = curl2.PostDownload(uri, dest, []byte(dataRaw), nil)
+	size, err = curl.PostDownload(uri, dest, []byte(dataRaw), nil)
 	return
 }

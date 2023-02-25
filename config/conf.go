@@ -15,7 +15,6 @@ type Input struct {
 	DUrl       string //单个输入URL
 	UrlsFile   string //输入urls.txt
 	CookieFile string //输入cookie.txt
-	PageSeq    int    //多图，从第几个开始（只对下载是多张图片的图书馆有效）
 	Volume     int    //多册，只下第N册
 	Speed      uint   //限速
 	SaveFolder string //下载文件存放目录，默认为当前文件夹下 Downloads 目录下
@@ -43,7 +42,6 @@ func Init(ctx context.Context) bool {
 
 	flag.StringVar(&Conf.UrlsFile, "i", "", "下载的URLs，指定任意本地文件，例如：urls.txt")
 	flag.StringVar(&Conf.SaveFolder, "o", dir, "下载保存到目录")
-	flag.IntVar(&Conf.PageSeq, "seq", 0, "图书起始页面数字")
 	flag.IntVar(&Conf.Volume, "vol", 0, "多册图书，只下第N册")
 	flag.IntVar(&Conf.FullImageWidth, "w", 7000, "指定图片宽度像素。推荐2400，若>6400为最大图")
 	flag.IntVar(&Conf.UseNumericFilename, "fn", 1, "保存文件名规则。可选值[0|1]。0=中文名，1=数字名。仅对 read.nlc.cn 有效。")

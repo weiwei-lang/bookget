@@ -2,8 +2,8 @@ package niiac
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -22,7 +22,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	imageUrls, iiifUrls := getImageUrls(bookId, taskUrl)
@@ -33,27 +33,24 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	log.Printf(" %d pages.\n", size)
 
 	destPath := config.CreateDirectory(taskUrl, bookId)
-	util2.CreateShell(destPath, iiifUrls, nil)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		uri := imageUrls[i] //从0开始
+	util.CreateShell(destPath, iiifUrls, nil)
+	for i, uri := range imageUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 }
 
 func getImageUrls(bookId, bookUrl string) (imgUrls []string, iiifUrls []string) {
 	uri := fmt.Sprintf("%s/manifest.json", bookUrl)
 	var manifest = new(Manifest)
-	bs, err := curl2.Get(uri, nil)
+	bs, err := curl.Get(uri, nil)
 	if err != nil {
 		return
 	}

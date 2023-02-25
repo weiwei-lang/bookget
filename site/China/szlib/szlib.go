@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -24,7 +24,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	rstVolumes := getMultiplebooks(bookId)
@@ -48,8 +48,8 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 			if imgUrl == "" {
 				continue
 			}
-			ext := util2.FileExt(imgUrl)
-			sortId := util2.GenNumberSorted(i + 1)
+			ext := util.FileExt(imgUrl)
+			sortId := util.GenNumberSorted(i + 1)
 			log.Printf("Get %s  %s\n", sortId, imgUrl)
 			fileName := fmt.Sprintf("vol%d_%s%s", j+1, sortId, ext)
 			dest := config.GetDestPath(taskUrl, bookId, fileName)
@@ -82,7 +82,7 @@ func getCanvases(bookId string, item Directory) (canvases Canvases) {
 	p1 := getOnePage(bookId, item.Volume, item.Children[0].Page)
 	pos := strings.LastIndex(p1, "/")
 	urlPre := p1[:pos]
-	ext := util2.FileExt(p1)
+	ext := util.FileExt(p1)
 	for _, child := range item.Children {
 		imgUrl := fmt.Sprintf("%s/%s%s", urlPre, child.Page, ext)
 		canvases.ImgUrls = append(canvases.ImgUrls, imgUrl)

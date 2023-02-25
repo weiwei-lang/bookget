@@ -42,15 +42,12 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 
 	//循环下载图片
 	ext := ".jpg"
-	//用户自定义起始页
-	i := util.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		u := canvases.ImgUrls[i]
-		if u == "" {
+	for i, uri := range canvases.ImgUrls {
+		if uri == "" {
 			continue
 		}
 		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, u)
+		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
 		fi, err := os.Stat(dest)
@@ -58,8 +55,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 			continue
 		}
 		token := getToken(requestVerificationToken, cookies)
-		imgurl := fmt.Sprintf("https://rbook.ncl.edu.tw%s&token=%s", u, token)
+		imgurl := fmt.Sprintf("https://rbook.ncl.edu.tw%s&token=%s", uri, token)
 		curl.FastGet(imgurl, dest, nil, false)
+		util.PrintSleepTime(config.Conf.Speed)
 	}
 	return
 }

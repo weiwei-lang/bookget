@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,7 +24,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	pdfUrls := PdfUrls{}
@@ -39,19 +39,17 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	log.Printf(" %d PDFs.\n", size)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
+
 	ext := ".pdf"
-	for ; i < size; i++ {
-		pdfUrl := pdfUrls[i]
-		if pdfUrl.Url == "" {
+	for i, v := range pdfUrls {
+		if v.Url == "" {
 			continue
 		}
-		sortId := util2.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, pdfUrl.Url)
-		fileName := pdfUrl.Name + ext
+		sortId := util.GenNumberSorted(i + 1)
+		log.Printf("Get %s  %s\n", sortId, v.Url)
+		fileName := v.Name + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		gohttp.FastGet(pdfUrl.Url, gohttp.Options{
+		gohttp.FastGet(v.Url, gohttp.Options{
 			DestFile:    dest,
 			Overwrite:   false,
 			Concurrency: config.Conf.Threads,

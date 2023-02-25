@@ -1,12 +1,15 @@
 package util
 
 import (
+	"bookget/config"
 	"bufio"
 	"context"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
+	"time"
 )
 
 func RunCommand(ctx context.Context, text string) error {
@@ -53,4 +56,20 @@ func GetOutput(reader *bufio.Reader) {
 		sumOutput += output
 	}
 	return
+}
+
+// PrintSleepTime 打印0-60秒等待
+func PrintSleepTime(sec uint) {
+	if sec <= 0 || sec > 60 {
+		return
+	}
+	for t := sec; t > 0; t-- {
+		seconds := strconv.Itoa(int(t))
+		if t < 10 {
+			seconds = fmt.Sprintf("0%d", t)
+		}
+		fmt.Printf("\rplease wait.... [00:%s of appr. Max %d sec]", seconds, config.Conf.Speed)
+		time.Sleep(time.Second)
+	}
+	fmt.Println()
 }

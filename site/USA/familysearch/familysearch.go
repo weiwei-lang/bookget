@@ -4,7 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/curl"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"bookget/lib/zhash"
 	"encoding/json"
 	"errors"
@@ -26,7 +26,7 @@ var CookieJar *cookiejar.Jar
 func Init(iTask int, sUrl string) (msg string, err error) {
 	CookieJar, _ = cookiejar.New(nil)
 	dl := new(Downloader)
-	dl.Domain = util2.GetHostUrl(sUrl)
+	dl.Domain = util.GetHostUrl(sUrl)
 	dl.Url = sUrl
 	dl.Index = iTask
 	dl.BookId = getBookId(dl)
@@ -38,7 +38,7 @@ func Init(iTask int, sUrl string) (msg string, err error) {
 }
 
 func download(t *Downloader) (msg string, err error) {
-	name := util2.GenNumberSorted(t.Index)
+	name := util.GenNumberSorted(t.Index)
 	log.Printf("Get %s  %s\n", name, t.Url)
 
 	imageData, err := getImageData(t.Url, config.Conf.CookieFile)
@@ -69,7 +69,7 @@ func download(t *Downloader) (msg string, err error) {
 		}
 		id := m[1]
 		dUrl := fmt.Sprintf(dasTemplate, id, "dist.jpg?proxy=true")
-		sortId := util2.GenNumberSorted(index + 1)
+		sortId := util.GenNumberSorted(index + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
 		fileName := sortId + ".jpg"
 		dest := config.GetDestPath(t.Url, t.BookId, fileName)
@@ -120,7 +120,7 @@ func createShell(destPath string, filmData *ResultFilmData, cookieFile string) {
 		dziUrl = append(dziUrl, dUrl)
 	}
 	header, _ := curl.GetHeaderFile(cookieFile)
-	util2.CreateShell(destPath, dziUrl, header)
+	util.CreateShell(destPath, dziUrl, header)
 
 	return
 }

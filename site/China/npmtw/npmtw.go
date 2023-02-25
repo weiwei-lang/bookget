@@ -2,8 +2,8 @@ package npmtw
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -22,7 +22,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	canvases := getImageUrls(bookId, taskUrl)
 	if canvases.ImgUrls == nil {
@@ -30,26 +30,23 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
-	util2.CreateShell(destPath, canvases.IiifUrls, nil)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		uri := canvases.ImgUrls[i] //从0开始
+	util.CreateShell(destPath, canvases.IiifUrls, nil)
+	for i, uri := range canvases.ImgUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		dest := config.GetDestPath(taskUrl, bookId, sortId+ext)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 }
 
 func getImageUrls(bookId, taskUrl string) (canvases Canvases) {
 	var manifest = new(Manifest)
 	u := fmt.Sprintf("https://digitalarchive.npm.gov.tw/Painting/setJson?pid=%s&Dept=P", bookId)
-	bs, err := curl2.Get(u, nil)
+	bs, err := curl.Get(u, nil)
 	if err != nil {
 		return
 	}

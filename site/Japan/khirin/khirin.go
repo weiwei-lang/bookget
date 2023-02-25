@@ -2,8 +2,8 @@ package khirin
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,7 +15,7 @@ import (
 func Init(iTask int, taskUrl string) (msg string, err error) {
 	//StartDownload(iTask, taskUrl, bookId)
 	taskUrls := explanRegexpUrl(taskUrl)
-	taskName := util2.GenNumberSorted(iTask)
+	taskName := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", taskName, taskUrl)
 	for i, tUrl := range taskUrls {
 		bookId := getBookId(tUrl)
@@ -23,7 +23,7 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 			continue
 		}
 		config.CreateDirectory(taskUrl, bookId)
-		name := util2.GenNumberSorted(i + 1)
+		name := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", name, tUrl)
 		startDownload(tUrl, bookId)
 	}
@@ -43,7 +43,7 @@ func getBookId(taskUrl string) string {
 }
 
 func explanRegexpUrl(taskUrl string) (taskUrls []string) {
-	uriMatch, ok := util2.GetUriMatch(taskUrl)
+	uriMatch, ok := util.GetUriMatch(taskUrl)
 	if ok {
 		iMinLen := len(uriMatch.Min)
 		for i := uriMatch.IMin; i <= uriMatch.IMax; i++ {
@@ -51,7 +51,7 @@ func explanRegexpUrl(taskUrl string) (taskUrls []string) {
 			if iLen < iMinLen {
 				iLen = iMinLen
 			}
-			sortId := util2.GenNumberLimitLen(i, iLen)
+			sortId := util.GenNumberLimitLen(i, iLen)
 			dUrl := regexp.MustCompile(`\((\d+)-(\d+)\)`).ReplaceAll([]byte(taskUrl), []byte(sortId))
 			sUrl := string(dUrl)
 			taskUrls = append(taskUrls, sUrl)
@@ -69,25 +69,22 @@ func startDownload(pageUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(pageUrl, bookId)
-	util2.CreateShell(destPath, canvases.IiifUrls, nil)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		uri := canvases.ImgUrls[i] //从0开始
+	util.CreateShell(destPath, canvases.IiifUrls, nil)
+	for i, uri := range canvases.ImgUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(pageUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 }
 
 func getManifestUrl(pageUrl string) (uri string, err error) {
-	bs, err := curl2.Get(pageUrl, nil)
+	bs, err := curl.Get(pageUrl, nil)
 	if err != nil {
 		return
 	}
@@ -110,7 +107,7 @@ func getCanvases(pageUrl string) (canvases Canvases) {
 	if err != nil {
 		return
 	}
-	bs, err := curl2.Get(uri, nil)
+	bs, err := curl.Get(uri, nil)
 	if err != nil {
 		return
 	}

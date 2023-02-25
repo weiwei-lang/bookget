@@ -2,8 +2,8 @@ package yonezawa
 
 import (
 	"bookget/config"
-	curl2 "bookget/lib/curl"
-	util2 "bookget/lib/util"
+	curl "bookget/lib/curl"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"regexp"
@@ -12,7 +12,7 @@ import (
 )
 
 func Init(iTask int, taskUrl string) (msg string, err error) {
-	taskName := util2.GenNumberSorted(iTask)
+	taskName := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", taskName, taskUrl)
 
 	bookId := getBookId(taskUrl)
@@ -38,24 +38,21 @@ func StartDownload(pageUrl, bookId string) {
 		return
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(canvases.Size)
-	for ; i < canvases.Size; i++ {
-		uri := canvases.ImgUrls[i] //从0开始
+	for i, uri := range canvases.ImgUrls {
 		if uri == "" {
 			continue
 		}
-		ext := util2.FileExt(uri)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(uri)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		fileName := sortId + ext
 		dest := config.GetDestPath(pageUrl, bookId, fileName)
-		curl2.FastGet(uri, dest, nil, true)
+		curl.FastGet(uri, dest, nil, true)
 	}
 }
 
 func getCanvases(uri string) (canvases Canvases) {
-	bs, err := curl2.Get(uri, nil)
+	bs, err := curl.Get(uri, nil)
 	if err != nil {
 		return
 	}
@@ -103,7 +100,7 @@ func makeUri(imageDir, val string, i int) string {
 	book := val[0:8]
 	page := val[len(val)-3:]
 	page = regexp.MustCompile(`^0+0?`).ReplaceAllString(page, "")
-	sortId := util2.GenNumberLimitLen(i, 3)
+	sortId := util.GenNumberLimitLen(i, 3)
 	s := fmt.Sprintf("%s%s/%s_%s.jpg", imageDir, dir2, book, sortId)
 	return s
 }

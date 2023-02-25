@@ -3,7 +3,7 @@ package loc
 import (
 	"bookget/config"
 	"bookget/lib/gohttp"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,24 +25,21 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
-	pages := getPages(bookId)
-	size := len(pages)
+	imageUrls := getPages(bookId)
+	size := len(imageUrls)
 	log.Printf(" %d pages.\n", size)
 
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
-	//用户自定义起始页
-	i := util2.LoopIndexStart(size)
-	for ; i < size; i++ {
-		dUrl := pages[i] //从0开始
+	for i, dUrl := range imageUrls {
 		if dUrl == "" {
 			continue
 		}
-		ext := util2.FileExt(dUrl)
-		sortId := util2.GenNumberSorted(i + 1)
+		ext := util.FileExt(dUrl)
+		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
 		fileName := sortId + ext
 		dest := config.GetDestPath(taskUrl, bookId, fileName)
@@ -56,6 +53,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 				"user-agent": config.UserAgent,
 			},
 		})
+		util.PrintSleepTime(config.Conf.Speed)
 	}
 }
 

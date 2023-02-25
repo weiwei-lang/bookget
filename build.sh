@@ -1,4 +1,4 @@
-ver="1.0.3"
+ver="1.0.4"
 
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o target/bookget_v${ver}_windows/bookget.exe .
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o target/bookget_v${ver}_linux/bookget .

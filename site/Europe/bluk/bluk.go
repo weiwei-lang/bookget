@@ -3,7 +3,7 @@ package bluk
 import (
 	"bookget/config"
 	"bookget/lib/curl"
-	util2 "bookget/lib/util"
+	util "bookget/lib/util"
 	"fmt"
 	"log"
 	"regexp"
@@ -22,12 +22,12 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 }
 
 func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util2.GenNumberSorted(iTask)
+	name := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	canvases := getImageUrls(taskUrl)
 	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
-	util2.CreateShell(destPath, canvases.IiifUrls, nil)
+	util.CreateShell(destPath, canvases.IiifUrls, nil)
 	fmt.Println("Please run the file [dezoomify-rs.urls] to start the download.")
 }
 

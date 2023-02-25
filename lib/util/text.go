@@ -1,7 +1,6 @@
 package util
 
 import (
-	"bookget/config"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -52,14 +51,4 @@ func GetHostUrl(uri string) string {
 	}
 	var hostUrl = fmt.Sprintf("%s://%s/", u.Scheme, u.Host)
 	return hostUrl
-}
-
-func LoopIndexStart(size int) int {
-	//用户自定义起始页
-	i := 0
-
-	if config.Conf.PageSeq > i && config.Conf.PageSeq < size {
-		i = config.Conf.PageSeq - 1
-	}
-	return i
 }
