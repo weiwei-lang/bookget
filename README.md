@@ -9,7 +9,7 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
 ### 中国地区数字图书馆：
 1. [中国][国家图书馆](http://read.nlc.cn/thematDataSearch/toGujiIndex)
 1. [中国][香港中文大学图书馆](https://repository.lib.cuhk.edu.hk/sc/collection)
-1. [中国][香港科技大学图书馆](https://lbezone.ust.hk/)
+1. [中国][香港科技大学图书馆](https://lbezone.hkust.edu.hk/)
 1. [中国][台北古籍与特藏文献](http://rbook.ncl.edu.tw/)
 1. [中国][台北故宫博物院 – 善本古籍 ](https://rbk-doc.npm.edu.tw/)
 1. [中国][四川省古籍数字图书馆](http://guji.sclib.org/qt-zxsk.html)
