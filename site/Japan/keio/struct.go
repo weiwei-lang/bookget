@@ -1,5 +1,21 @@
 package keio
 
+import "net/url"
+
+type DownloadTask struct {
+	Index     int
+	Url       string
+	UrlParsed *url.URL
+	SavePath  string
+	BookId    string
+}
+
+type Canvases struct {
+	ImgUrls  []string
+	IiifUrls []string
+	Size     int
+}
+
 type Manifest struct {
 	Context  string `json:"@context"`
 	Id       string `json:"@id"`

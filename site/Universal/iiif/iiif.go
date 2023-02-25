@@ -47,14 +47,16 @@ func StartDownload(pageUrl, bookId string) {
 		log.Printf("Get %s  %s\n", sortId, uri)
 		filename := sortId + ext
 		dest := config.GetDestPath(pageUrl, bookId, filename)
-		cli := gohttp.NewClient(gohttp.Options{
-			DestFile:   dest,
-			CookieFile: config.Conf.CookieFile,
+		opts := gohttp.Options{
+			DestFile:    dest,
+			Overwrite:   false,
+			Concurrency: 1,
+			CookieFile:  config.Conf.CookieFile,
 			Headers: map[string]interface{}{
 				"User-Agent": config.Conf.UserAgent,
 			},
-		})
-		_, err := cli.Get(uri)
+		}
+		_, err := gohttp.FastGet(uri, opts)
 		if err != nil {
 			fmt.Println(err)
 		}

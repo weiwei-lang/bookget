@@ -3,60 +3,89 @@ package keio
 import (
 	"bookget/config"
 	curl "bookget/lib/curl"
+	"bookget/lib/gohttp"
 	util "bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 	"strings"
 )
 
-func Init(iTask int, taskUrl string) (msg string, err error) {
+func Init(iTask int, sUrl string) (msg string, err error) {
+	dt := new(DownloadTask)
+	dt.UrlParsed, err = url.Parse(sUrl)
+	dt.Url = sUrl
+	dt.Index = iTask
+	return Download(dt)
+}
+
+func getBookId(text string) string {
+	sUrl := strings.ToLower(text)
 	bookId := ""
-	m := regexp.MustCompile(`id=([A-Za-z0-9]+)`).FindStringSubmatch(taskUrl)
+	m := regexp.MustCompile(`id=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
 	if m != nil {
 		bookId = m[1]
-		config.CreateDirectory(taskUrl, bookId)
-		StartDownload(iTask, taskUrl, bookId)
+	}
+	return bookId
+}
+
+func Download(dt *DownloadTask) (msg string, err error) {
+	dt.BookId = getBookId(dt.Url)
+	if dt.BookId == "" {
+		return "", err
+	}
+
+	name := util.GenNumberSorted(dt.Index)
+	log.Printf("Get %s  %s\n", name, dt.Url)
+	volumes := getBookVolumes(dt)
+	log.Printf(" %d volumes(parts).\n", len(volumes))
+
+	for k, vol := range volumes {
+		if config.Conf.Volume > 0 && config.Conf.Volume != k+1 {
+			continue
+		}
+		canvases, err := getCanvases(vol)
+		log.Printf(" %d/%d volume, %d pages \n", k+1, len(volumes), canvases.Size)
+		if err != nil {
+			continue
+		}
+		volPath := fmt.Sprintf("%s_volume%d", dt.BookId, k+1)
+		//iif shell
+		destPath := config.CreateDirectory(vol, volPath)
+		util.CreateShell(destPath, canvases.IiifUrls, nil)
+
+		//download it
+		for i, uri := range canvases.ImgUrls {
+			if uri == "" || err != nil {
+				continue
+			}
+			ext := util.FileExt(uri)
+			sortId := util.GenNumberSorted(i + 1)
+			log.Printf("Get %s  %s\n", sortId, uri)
+			filename := sortId + ext
+			dest := config.GetDestPath(uri, volPath, filename)
+			opts := gohttp.Options{
+				DestFile:    dest,
+				Overwrite:   false,
+				Concurrency: 1,
+				CookieFile:  config.Conf.CookieFile,
+				Headers: map[string]interface{}{
+					"User-Agent": config.Conf.UserAgent,
+				},
+			}
+			_, err := gohttp.FastGet(uri, opts)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 	}
 	return "", err
 }
 
-func StartDownload(iTask int, taskUrl, bookId string) {
-	name := util.GenNumberSorted(iTask)
-	log.Printf("Get %s  %s\n", name, taskUrl)
-	bookUrls, size := getMultiplebooks(bookId, taskUrl)
-	if bookUrls == nil || size == 0 {
-		return
-	}
-	log.Printf(" %d books.\n", size)
-	imageUrls := make([]string, 0, 100*size)
-	iiifUrls := make([]string, 0, 100*size)
-	for k, u := range *bookUrls {
-		imgs, iiifs := getImageUrls(u)
-		fmt.Printf("\rBook %d has  %d pages. ", k+1, len(*imgs))
-		if imgs != nil {
-			imageUrls = append(imageUrls, *imgs...)
-		}
-		if iiifs != nil {
-			iiifUrls = append(iiifUrls, *iiifs...)
-		}
-	}
-	size = len(imageUrls)
-	log.Printf("\n %d pages.\n", size)
-	destPath := config.CreateDirectory(taskUrl, bookId)
-	util.CreateShell(destPath, iiifUrls, nil)
-	for i, uri := range imageUrls {
-		if uri == "" {
-			continue
-		}
-		getSingleImage(i, uri, bookId)
-	}
-
-}
-
-func getMultiplebooks(bookId string, bookUrl string) (bookUrls *[]string, size int) {
-	bs, err := curl.Get(bookUrl, nil)
+func getBookVolumes(dt *DownloadTask) (volumeUrls []string) {
+	bs, err := curl.Get(dt.Url, nil)
 	if err != nil {
 		return
 	}
@@ -66,16 +95,15 @@ func getMultiplebooks(bookId string, bookUrl string) (bookUrls *[]string, size i
 	if matches == nil {
 		return
 	}
-	size = len(matches)
-	volumeUrls := make([]string, 0, size)
-
+	size := len(matches)
+	volumeUrls = make([]string, 0, size)
 	for _, v := range matches {
-		childId := makeId(v[1], bookId, size)
+		childId := makeId(v[1], dt.BookId, size)
 		fmt.Sprintf("%s\n", childId)
-		uri := fmt.Sprintf("https://db2.sido.keio.ac.jp/iiif/manifests/kanseki/%s/%s/manifest.json", bookId, childId)
+		uri := fmt.Sprintf("https://db2.sido.keio.ac.jp/iiif/manifests/kanseki/%s/%s/manifest.json", dt.BookId, childId)
 		volumeUrls = append(volumeUrls, uri)
 	}
-	return &volumeUrls, size
+	return volumeUrls
 }
 
 func makeId(childId string, bookId string, iMax int) string {
@@ -92,22 +120,19 @@ func makeId(childId string, bookId string, iMax int) string {
 	return bookId + "-" + childIDfmt
 }
 
-func getSingleImage(i int, uri, bookId string) {
-	ext := util.FileExt(uri)
-	sortId := util.GenNumberSorted(i + 1)
-	log.Printf("Get %s  %s\n", sortId, uri)
-	fileName := sortId + ext
-	dest := config.GetDestPath(uri, bookId, fileName)
-	curl.FastGet(uri, dest, nil, true)
-}
-
-func getImageUrls(bookUrl string) (imgUrls *[]string, iiifUrls *[]string) {
-	var manifest = new(Manifest)
-	bs, err := curl.Get(bookUrl, nil)
+func getCanvases(uri string) (canvases Canvases, err error) {
+	cli := gohttp.NewClient(gohttp.Options{
+		CookieFile: config.Conf.CookieFile,
+		Headers: map[string]interface{}{
+			"User-Agent": config.Conf.UserAgent,
+		},
+	})
+	resp, err := cli.Get(uri)
 	if err != nil {
 		return
 	}
-
+	bs, _ := resp.GetBody()
+	//delete '?'
 	if bs[0] != 123 {
 		for i := 0; i < len(bs); i++ {
 			if bs[i] == 123 {
@@ -116,6 +141,11 @@ func getImageUrls(bookUrl string) (imgUrls *[]string, iiifUrls *[]string) {
 			}
 		}
 	}
+	return parseXml(bs)
+}
+
+func parseXml(bs []byte) (canvases Canvases, err error) {
+	var manifest = new(Manifest)
 	if err = json.Unmarshal(bs, manifest); err != nil {
 		log.Printf("json.Unmarshal failed: %s\n", err)
 		return
@@ -123,31 +153,29 @@ func getImageUrls(bookUrl string) (imgUrls *[]string, iiifUrls *[]string) {
 	if len(manifest.Sequences) == 0 {
 		return
 	}
-	i := len(manifest.Sequences[0].Canvases)
-	imgUri := make([]string, 0, i)
-	iiifUri := make([]string, 0, i)
 	newWidth := ""
 	//>6400使用原图
 	if config.Conf.FullImageWidth > 6400 {
-		newWidth = "full/full/"
+		newWidth = "full/full"
 	} else if config.Conf.FullImageWidth >= 1000 {
-		newWidth = fmt.Sprintf("full/%d,/", config.Conf.FullImageWidth)
+		newWidth = fmt.Sprintf("full/%d,", config.Conf.FullImageWidth)
 	}
-	for _, sequence := range manifest.Sequences {
-		for _, canvase := range sequence.Canvases {
-			for _, image := range canvase.Images {
-				//dezoomify-rs URL
-				iiiInfo := fmt.Sprintf("%s/info.json", image.Resource.Service.Id)
-				iiifUri = append(iiifUri, iiiInfo)
 
-				//JPEG URL
-				imgUrl := image.Resource.Id
-				if newWidth != "" {
-					imgUrl = strings.Replace(image.Resource.Id, "full/full/", newWidth, 1)
-				}
-				imgUri = append(imgUri, imgUrl)
-			}
+	size := len(manifest.Sequences[0].Canvases)
+	canvases.ImgUrls = make([]string, 0, size)
+	canvases.IiifUrls = make([]string, 0, size)
+	for _, canvase := range manifest.Sequences[0].Canvases {
+		for _, image := range canvase.Images {
+			//iifUrl, _ := url.QueryUnescape(image.Resource.Service.Id)
+			//dezoomify-rs URL
+			iiiInfo := fmt.Sprintf("%s/info.json", image.Resource.Service.Id)
+			canvases.IiifUrls = append(canvases.IiifUrls, iiiInfo)
+
+			//JPEG URL
+			imgUrl := fmt.Sprintf("%s/%s/0/default.jpg", image.Resource.Service.Id, newWidth)
+			canvases.ImgUrls = append(canvases.ImgUrls, imgUrl)
 		}
 	}
-	return &imgUri, &iiifUri
+	canvases.Size = size
+	return canvases, nil
 }

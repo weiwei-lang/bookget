@@ -47,7 +47,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		if config.Conf.Volume > 0 && config.Conf.Volume != p+1 {
 			continue
 		}
-		id := fmt.Sprintf("%s_Volume%d", dt.BookId, vol.Sort)
+		id := fmt.Sprintf("%s_volume%d", dt.BookId, vol.Sort)
 		dt.SavePath = config.CreateDirectory(dt.Url, id)
 		log.Printf(" %d/%d volume, %d pages \n", vol.Sort, len(volumes), len(parts[vol.FascicleId]))
 		for i, record := range parts[vol.FascicleId] {
