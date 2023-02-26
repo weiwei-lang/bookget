@@ -15,9 +15,23 @@ type Item struct {
 		H int `json:"h"`
 		W int `json:"w"`
 	} `json:"tile_size"`
+	TileSize2 struct {
+		Height int `json:"height"`
+		Width  int `json:"width"`
+	} `json:"tileSize"`
 	Width int `json:"width"`
 }
 
 type ResponseBody struct {
 	Tiles map[string]Item `json:"tiles"`
+}
+
+type ResponseServerBase struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Title      string   `json:"title"`
+		ServerBase string   `json:"serverBase"`
+		Images     []string `json:"images"`
+	} `json:"data"`
 }

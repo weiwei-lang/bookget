@@ -42,7 +42,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	name := util.GenNumberSorted(dt.Index)
 	log.Printf("Get %s  %s\n", name, dt.Url)
 	apiServer := getApiServer(dt.BookId, dt.UrlParsed)
-	tiles, err := getCanvases(dt.BookId, config.Conf.CookieFile, apiServer)
+	respBody, err := getCanvases(dt.BookId, config.Conf.CookieFile, apiServer)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -64,16 +64,22 @@ func Download(dt *DownloadTask) (msg string, err error) {
     }
 }
 `
-	dziUrls := make([]string, 0, len(tiles))
-	for key, item := range tiles {
+	dziUrls := make([]string, 0, len(respBody.Tiles))
+	for key, item := range respBody.Tiles {
 		k := regexp.MustCompile(`(\d+)`).FindString(key)
 		i, _ := strconv.Atoi(k)
 		sortId := fmt.Sprintf("%s.json", util.GenNumberSorted(i))
 		dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 		serverUrl := fmt.Sprintf("%s/tiles/%s/", apiServer, key)
-		txt := fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
+
+		jsonText := ""
+		if item.TileSize.W == 0 {
+			jsonText = fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize2.Width, item.Height, item.Width)
+		} else {
+			jsonText = fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
+		}
 		log.Printf("Create a new file %s \n", sortId)
-		util.FileWrite([]byte(txt), dest)
+		util.FileWrite([]byte(jsonText), dest)
 		dziUrls = append(dziUrls, sortId)
 	}
 	sort.Sort(strs(dziUrls))
@@ -85,10 +91,10 @@ func getApiServer(bookId string, u *url.URL) string {
 	var apiServer string
 	switch u.Host {
 	case "msq.ynlib.cn":
-		apiServer = fmt.Sprintf("%s://%s/medias2022/%s", u.Scheme, u.Host, bookId)
+		apiServer = getServerUri(bookId, u)
 		break
 	case "guji.sclib.org":
-		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
+		apiServer = getServerUri(bookId, u)
 		break
 	case "218.2.105.121":
 		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
@@ -97,6 +103,24 @@ func getApiServer(bookId string, u *url.URL) string {
 		apiServer = fmt.Sprintf("%s://%s/medias/%s", u.Scheme, u.Host, bookId)
 	}
 	return apiServer
+}
+
+func getServerUri(bookId string, u *url.URL) string {
+	m := regexp.MustCompile(`(?i)typeId=([A-z0-9_-]+)`).FindStringSubmatch(u.RawQuery)
+	typeId := 80
+	if m != nil {
+		typeId, _ = strconv.Atoi(m[1])
+	}
+	apiUrl := fmt.Sprintf("%s://%s/portal/book/view?bookId=%s&typeId=%d", u.Scheme, u.Host, bookId, typeId)
+	bs, err := getBody(apiUrl)
+	if err != nil {
+		return ""
+	}
+	var respServerBase ResponseServerBase
+	if err = json.Unmarshal(bs, &respServerBase); err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, respServerBase.Data.ServerBase)
 }
 
 func getBookId(text string) string {
@@ -113,7 +137,7 @@ func getBookId(text string) string {
 	return bookId
 }
 
-func getCanvases(bookId string, cookieFile string, apiServer string) (tiles map[string]Item, err error) {
+func getCanvases(bookId string, cookieFile string, apiServer string) (respBody ResponseBody, err error) {
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
 	apiUrl := fmt.Sprintf("%s/tiles/infos.json", apiServer)
@@ -126,19 +150,36 @@ func getCanvases(bookId string, cookieFile string, apiServer string) (tiles map[
 	})
 	resp, err := cli.Get(apiUrl)
 	if err != nil {
-		return nil, err
+		return
 	}
 	bs, _ := resp.GetBody()
 	if bs == nil {
 		err = errors.New(resp.GetReasonPhrase())
 		return
 	}
-	var result ResponseBody
-	if err = json.Unmarshal(bs, &result); err != nil {
+	if err = json.Unmarshal(bs, &respBody); err != nil {
 		return
 	}
-	if result.Tiles == nil {
-		return
+	return respBody, nil
+}
+
+func getBody(apiUrl string) ([]byte, error) {
+	jar, _ := cookiejar.New(nil)
+	cli := gohttp.NewClient(gohttp.Options{
+		CookieFile: config.Conf.CookieFile,
+		CookieJar:  jar,
+		Headers: map[string]interface{}{
+			"User-Agent": config.Conf.UserAgent,
+		},
+	})
+	resp, err := cli.Get(apiUrl)
+	if err != nil {
+		return nil, err
 	}
-	return result.Tiles, nil
+	bs, _ := resp.GetBody()
+	if bs == nil {
+		err = errors.New(resp.GetReasonPhrase())
+		return nil, err
+	}
+	return bs, nil
 }
