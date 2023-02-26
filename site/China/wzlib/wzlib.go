@@ -71,11 +71,11 @@ func getBook(bookId string) (pdf PdfUrl, err error) {
 		return
 	}
 	if result.Data.WzlPdfUrl == "" {
-		return pdf, errors.New("Not found pdfUrl.")
+		return pdf, errors.New("requested URL was not found.")
 	}
 	m := regexp.MustCompile(`file=(\S+)`).FindStringSubmatch(result.Data.WzlPdfUrl)
 	if m == nil {
-		return pdf, errors.New("Not found pdfUrl.")
+		return pdf, errors.New("requested URL was not found.")
 	}
 	pdf.Url = fmt.Sprintf("https://db.wzlib.cn%s", m[1])
 	pdf.Name = result.Data.DcTitle

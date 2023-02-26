@@ -16,7 +16,7 @@ import (
 func Init(iTask int, taskUrl string) (msg string, err error) {
 	bookId := getBookId(taskUrl)
 	if bookId == "" {
-		return "", errors.New("not found BookId")
+		return "", errors.New("requested URL was not found")
 	}
 	StartDownload(iTask, taskUrl, bookId)
 	return "", nil
@@ -35,7 +35,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	log.Printf("Get %s  %s\n", name, taskUrl)
 	bookUrls := getMultiplebooks(taskUrl)
 	if bookUrls == nil || len(bookUrls) == 0 {
-		log.Printf("Not found URLs.\n")
+		log.Printf("requested URL was not found.\n")
 		return
 	}
 	size := len(bookUrls)
@@ -52,7 +52,7 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 func do(bookId, bookUrl string) {
 	imagePages, cookies := getJpg2000Urls(bookUrl)
 	if imagePages == nil {
-		log.Printf("Not found URL.")
+		log.Printf("requested URL was not found.")
 		return
 	}
 	size := len(imagePages)

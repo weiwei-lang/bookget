@@ -48,7 +48,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	log.Printf("Get %s %s %s\n", name, dt.Title, dt.Url)
 
 	if cipherText == nil || len(cipherText) == 0 {
-		return "not found cipherText", err
+		return "cipherText not found", err
 	}
 	dziJson, dziFormat := getDziJson(cipherText)
 	sortId := fmt.Sprintf("%s.json", dt.BookId)

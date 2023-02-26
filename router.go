@@ -10,6 +10,7 @@ import (
 	"bookget/site/China/luoyang"
 	"bookget/site/China/nlc"
 	"bookget/site/China/npmtw"
+	"bookget/site/China/ouroots"
 	"bookget/site/China/rbkdocnpmtw"
 	"bookget/site/China/sclib"
 	"bookget/site/China/szlib"
@@ -342,6 +343,12 @@ func RegisterCommand() (err error) {
 	//041.北京故宫博物院-故宫名画记
 	err = Site.RegisterCommand("minghuaji.dpm.org.cn", bjdpm.Init)
 	err = Site.RegisterCommand("m-minghuaji.dpm.org.cn", bjdpm.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//042.中华寻根网-国图
+	err = Site.RegisterCommand("ouroots.nlc.cn", ouroots.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
