@@ -63,7 +63,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 				sortId := fmt.Sprintf("%s.jpg", util.GenNumberSorted(index+1))
 				dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 
-				fmt.Printf("Get %d/%d volume, %d/%d pages.", k+1, len(respVolume.Volume), index+1, vol.Pages)
+				log.Printf("Get %d/%d volume, %d/%d pages.\n", k+1, len(respVolume.Volume), i, vol.Pages)
 				util.FileWrite(bs, dest)
 				index++
 			}
