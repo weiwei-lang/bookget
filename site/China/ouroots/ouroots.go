@@ -97,7 +97,6 @@ func getToken() (string, error) {
 }
 
 func getVolumes(catalogKey string) (respVolume ResponseVolume, err error) {
-	//http://dsnode.ouroots.nlc.cn/gtService/data/catalogVolume?catalogKey=41510488&bookid=SZJP00001
 	jar, _ := cookiejar.New(nil)
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: config.Conf.CookieFile,
@@ -123,7 +122,6 @@ func getVolumes(catalogKey string) (respVolume ResponseVolume, err error) {
 }
 
 func getBase64Image(catalogKey string, volumeId, page int, userKey, token string) (respImage ResponseCatalogImage, err error) {
-	//http://dsnode.ouroots.nlc.cn/data/catalogImage?catalogKey=41510488&volumeId=2&page=1&userKey=1009787390&token=W6G67OAO32CFKMDNIIKGI79I61SA265MF93Q7FEJNKAAHNFG
 	jar, _ := cookiejar.New(nil)
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: config.Conf.CookieFile,
