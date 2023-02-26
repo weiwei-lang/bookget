@@ -22,6 +22,7 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
 1. [中国][江苏省珍贵古籍数字平台](http://218.2.105.121/)
 1. [中国][北京故宫博物院-故宫名画记](https://minghuaji.dpm.org.cn/) 或[移动端-故宫名画记](https://m-minghuaji.dpm.org.cn/)
 1. [中国][中华寻根网（国图）](http://ouroots.nlc.cn/genealogyCulture.html)
+1. [中国][国家哲学社会科学文献中心-古籍](https://www.ncpssd.org/Literature/ancientbooklist?nav=5)
 
 ### 欧美数字图书馆：
 1. [美国][哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)

@@ -8,6 +8,7 @@ import (
 	"bookget/site/China/idp"
 	"bookget/site/China/jslib"
 	"bookget/site/China/luoyang"
+	"bookget/site/China/ncpssd"
 	"bookget/site/China/nlc"
 	"bookget/site/China/npmtw"
 	"bookget/site/China/ouroots"
@@ -349,6 +350,12 @@ func RegisterCommand() (err error) {
 	}
 	//042.中华寻根网-国图
 	err = Site.RegisterCommand("ouroots.nlc.cn", ouroots.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//043.国家哲学社会科学文献中心
+	err = Site.RegisterCommand("www.ncpssd.org", ncpssd.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
