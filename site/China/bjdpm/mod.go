@@ -8,11 +8,16 @@ import (
 )
 
 const (
+	//故宫名画 minghuaji.dpm.org.cn
 	AES_KEY = "hQKWqRCPUFjUXv0q"
 	AES_IV  = "SH8csHyhBEnAPtwb"
+
+	//数字文物 digicol.dpm.org.cn
+	AES2_KEY = "tNzf3IrAXDCepOVQ"
+	AES2_IV  = "nE0d1QQdSy45uBX3"
 )
 
-func getDziJson(text []byte) (dziJson string, dzi DziFormat) {
+func getDziJson(host string, text []byte) (dziJson string, dzi DziFormat) {
 	template := `{
   "xmlns": "http://schemas.microsoft.com/deepzoom/2009",
   "Url": "%s",
@@ -25,7 +30,13 @@ func getDziJson(text []byte) (dziJson string, dzi DziFormat) {
   }
 }
 `
-	recoveredPt, err := xcrypt.DecryptByAes(string(text), []byte(AES_KEY), []byte(AES_IV))
+	var recoveredPt []byte
+	var err error
+	if host == "digicol.dpm.org.cn" {
+		recoveredPt, err = xcrypt.DecryptByAes(string(text), []byte(AES2_KEY), []byte(AES2_IV))
+	} else {
+		recoveredPt, err = xcrypt.DecryptByAes(string(text), []byte(AES_KEY), []byte(AES_IV))
+	}
 	if err != nil {
 		return
 	}

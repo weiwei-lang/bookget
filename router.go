@@ -64,6 +64,9 @@ func (b SiteMap) RegisterCommand(command string, f Init) error {
 }
 
 func (b SiteMap) Execute(command string, iTask int, uri string) (string, error) {
+	if uri == "" || !strings.HasPrefix(uri, "http") {
+		return "URL Not found.", nil
+	}
 	if config.Conf.AutoDetect > 0 {
 		if config.Conf.AutoDetect == 1 {
 			return Universal.StartDownload(iTask, uri)
@@ -344,6 +347,7 @@ func RegisterCommand() (err error) {
 	//041.北京故宫博物院-故宫名画记
 	err = Site.RegisterCommand("minghuaji.dpm.org.cn", bjdpm.Init)
 	err = Site.RegisterCommand("m-minghuaji.dpm.org.cn", bjdpm.Init)
+	err = Site.RegisterCommand("digicol.dpm.org.cn", bjdpm.Init)
 	if err != nil {
 		fmt.Println(err)
 		return

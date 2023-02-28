@@ -50,7 +50,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	if cipherText == nil || len(cipherText) == 0 {
 		return "cipherText not found", err
 	}
-	dziJson, dziFormat := getDziJson(cipherText)
+	dziJson, dziFormat := getDziJson(dt.UrlParsed.Host, cipherText)
 	sortId := fmt.Sprintf("%s.json", dt.BookId)
 	dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 
@@ -62,8 +62,8 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	dziUrls = append(dziUrls, sortId)
 
 	header := make(map[string]string, 4)
-	header["Origin"] = "https://minghuaji.dpm.org.cn"
-	header["Referer"] = "https://minghuaji.dpm.org.cn"
+	header["Origin"] = fmt.Sprintf("https://%s", dt.UrlParsed.Host)
+	header["Referer"] = fmt.Sprintf("https://%s", dt.UrlParsed.Host)
 	header["User-Agent"] = config.Conf.UserAgent
 
 	util.CreateShell(dt.SavePath, dziUrls, header)
@@ -91,7 +91,7 @@ func getTitle(bs []byte) string {
 
 func getCipherText(bs []byte) []byte {
 	//gv.init("",...)
-	m := regexp.MustCompile(`gv.init\("([^"]+)",`).FindSubmatch(bs)
+	m := regexp.MustCompile(`gv.init(?:[ \r\n\t\f]*)\("([^"]+)"`).FindSubmatch(bs)
 	if m == nil {
 		return nil
 	}
