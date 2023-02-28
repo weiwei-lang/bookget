@@ -145,7 +145,7 @@ func getImageUrls(uri string) (imgUrls []string) {
 	id, sec, _ := getIdSecu(text)
 
 	//整册合并为一个PDF？
-	if config.Conf.MergePDFs == 1 {
+	if config.Conf.MergePDFs {
 		max := len(matches)
 		first := matches[0][1]
 		last := matches[max-1][1]

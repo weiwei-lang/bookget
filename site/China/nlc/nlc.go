@@ -101,7 +101,7 @@ func fetchOneBook(i int, sUrl string, dt *DownloadTask) {
 	aid := m["aid"][0]
 	bid := m["bid"][0]
 	//取卷名
-	if config.Conf.UseNumericFilename == 0 {
+	if config.Conf.UseNumericFilename == false {
 		volumeName := getVolumeTitle(bid, aid, dt.Domain)
 		if volumeName != "" {
 			sortId += "." + volumeName
