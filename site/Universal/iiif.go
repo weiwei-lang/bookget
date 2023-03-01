@@ -60,6 +60,10 @@ func getManifestUrl(pageUrl, text string) string {
 	if m != nil {
 		return padUri(host, m[1])
 	}
+	m = regexp.MustCompile(`data-uri=["'](\S+)manifest(\S+).json["']`).FindStringSubmatch(text)
+	if m != nil {
+		return m[1] + "manifest" + m[2] + ".json"
+	}
 	m = regexp.MustCompile(`href=["'](\S+)/manifest.json["']`).FindStringSubmatch(text)
 	if m == nil {
 		return ""

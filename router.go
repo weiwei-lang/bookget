@@ -364,6 +364,12 @@ func RegisterCommand() (err error) {
 		fmt.Println(err)
 		return
 	}
+	//044.日本駒澤大学 电子贵重书库
+	err = Site.RegisterCommand("repo.komazawa-u.ac.jp", Universal.AutoDetectManifest)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	return
 }
 
