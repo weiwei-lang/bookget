@@ -47,7 +47,7 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
 1. [日本][国立公文书馆（内库文库）](https://www.digital.archives.go.jp/)
 1. [日本][东洋文库]( http://dsr.nii.ac.jp/toyobunko/index.html.ja)
 1. [日本][早稻田大学图书馆](https://www.wul.waseda.ac.jp/kotenseki/search.php)
-1. [日本][新日本古典籍综合数据库](https://kotenseki.nijl.ac.jp/)
+1. [日本][国書數據庫（古典籍）](https://kokusho.nijl.ac.jp/)
 1. [日本][京都大学人文科学研究所 - 东方学数字图书博物馆](http://kanji.zinbun.kyoto-u.ac.jp/db-machine/toho/html/top.html)
 1. [日本][国立历史民俗博物馆](https://khirin-a.rekihaku.ac.jp/)
 1. [日本][市立米泽图书馆](https://www.library.yonezawa.yamagata.jp/dg/zen.html)
