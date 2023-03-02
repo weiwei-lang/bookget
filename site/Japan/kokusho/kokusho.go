@@ -44,7 +44,7 @@ func getBookId(text string) string {
 }
 
 func getManifestUrl(bookId string) string {
-	apiUrl := fmt.Sprintf("https://kokusho.nijl.ac.jp/api/biblioDetail/%s?t=%u", bookId, time.Now().UnixMilli())
+	apiUrl := fmt.Sprintf("https://kokusho.nijl.ac.jp/api/biblioDetail/%s?t=%d", bookId, time.Now().UnixMilli())
 	var resp ResponseDetail
 	bs, err := getBody(apiUrl)
 	if err != nil {
