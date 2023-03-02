@@ -27,7 +27,7 @@ import (
 	"bookget/site/Japan/kanjikyoto"
 	"bookget/site/Japan/keio"
 	"bookget/site/Japan/khirin"
-	"bookget/site/Japan/kotenseki"
+	"bookget/site/Japan/kokusho"
 	"bookget/site/Japan/kyoto"
 	"bookget/site/Japan/national"
 	"bookget/site/Japan/ndl"
@@ -198,8 +198,8 @@ func RegisterCommand() (err error) {
 	//	fmt.Println(err)
 	//	return
 	//}
-	//018.新日本古典籍综合数据库
-	err = Site.RegisterCommand("kotenseki.nijl.ac.jp", kotenseki.Init)
+	//018.日本国書数据库（古典籍）
+	err = Site.RegisterCommand("kokusho.nijl.ac.jp", kokusho.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
