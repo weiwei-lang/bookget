@@ -19,6 +19,7 @@ import (
 	"bookget/site/China/twnlc"
 	"bookget/site/China/usthk"
 	"bookget/site/China/wzlib"
+	"bookget/site/China/ynutcm"
 	"bookget/site/Europe/bavaria"
 	"bookget/site/Europe/berlin"
 	"bookget/site/Europe/bluk"
@@ -366,6 +367,12 @@ func RegisterCommand() (err error) {
 	}
 	//044.日本駒澤大学 电子贵重书库
 	err = Site.RegisterCommand("repo.komazawa-u.ac.jp", Universal.AutoDetectManifest)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//045.云南中医药大学古籍图书馆
+	err = Site.RegisterCommand("guji.ynutcm.edu.cn", ynutcm.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
