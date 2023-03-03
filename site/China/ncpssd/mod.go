@@ -10,9 +10,9 @@ import (
 	"net/http/cookiejar"
 )
 
-func getToken() (string, error) {
+func getToken(sUrl string) (string, error) {
 	apiUrl := "https://www.ncpssd.org/get/server/date"
-	bs, err := getBody(apiUrl)
+	bs, err := getBody(apiUrl, sUrl)
 	if err != nil {
 		return "", err
 	}
@@ -26,13 +26,16 @@ func getToken() (string, error) {
 	return token, nil
 }
 
-func getBody(apiUrl string) ([]byte, error) {
+func getBody(apiUrl string, sUrl string) ([]byte, error) {
 	jar, _ := cookiejar.New(nil)
 	cli := gohttp.NewClient(gohttp.Options{
 		CookieFile: config.Conf.CookieFile,
 		CookieJar:  jar,
 		Headers: map[string]interface{}{
-			"User-Agent": config.Conf.UserAgent,
+			"User-Agent":       config.Conf.UserAgent,
+			"X-Requested-With": "XMLHttpRequest",
+			"Referer":          sUrl,
+			"Content-Type":     "application/json; charset=utf-8",
 		},
 	})
 	resp, err := cli.Get(apiUrl)
