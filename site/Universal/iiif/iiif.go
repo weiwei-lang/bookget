@@ -75,6 +75,16 @@ func getCanvases(uri string) (canvases Canvases, err error) {
 		return
 	}
 	bs, _ := resp.GetBody()
+	//fix bug https://www.dh-jac.net/db1/books/results-iiif.php?f1==nar-h13-01-01&f12=1&enter=portal
+	//delete '?'
+	if bs[0] != 123 {
+		for i := 0; i < len(bs); i++ {
+			if bs[i] == 123 {
+				bs = bs[i:]
+				break
+			}
+		}
+	}
 	return parseXml(bs)
 }
 
