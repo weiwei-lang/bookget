@@ -63,6 +63,7 @@ func PrintSleepTime(sec uint) {
 	if sec <= 0 || sec > 60 {
 		return
 	}
+	fmt.Println()
 	for t := sec; t > 0; t-- {
 		seconds := strconv.Itoa(int(t))
 		if t < 10 {
