@@ -55,6 +55,7 @@ bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。
 1. [日本][庆应义塾大学图书馆](https://dcollections.lib.keio.ac.jp/ja/kanseki)
 1. [日本][关西大学图书馆](https://www.iiif.ku-orcas.kansai-u.ac.jp/books)
 1. [日本][駒澤大學電子貴重書庫](http://repo.komazawa-u.ac.jp/opac/repository/collections/)
+1. [日本][大阪府立圖書館](http://e-library2.gprime.jp/lib_pref_osaka/da/searchCommon/)
 
 
 ### 其它数字图书馆：

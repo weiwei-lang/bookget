@@ -25,6 +25,7 @@ import (
 	"bookget/site/Europe/bluk"
 	"bookget/site/Europe/oxacuk"
 	"bookget/site/Japan/emuseum"
+	"bookget/site/Japan/gprime"
 	"bookget/site/Japan/kanjikyoto"
 	"bookget/site/Japan/keio"
 	"bookget/site/Japan/khirin"
@@ -373,6 +374,12 @@ func RegisterCommand() (err error) {
 	}
 	//045.云南中医药大学古籍图书馆
 	err = Site.RegisterCommand("guji.ynutcm.edu.cn", ynutcm.Init)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//046.日本大阪府立圖書館
+	err = Site.RegisterCommand("e-library2.gprime.jp", gprime.Init)
 	if err != nil {
 		fmt.Println(err)
 		return
