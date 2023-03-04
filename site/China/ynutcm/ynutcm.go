@@ -75,6 +75,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 					"user-agent": config.UserAgent,
 				},
 			})
+			util.PrintSleepTime(config.Conf.Speed)
 		}
 	}
 	return "", nil
