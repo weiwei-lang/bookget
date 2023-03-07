@@ -11,6 +11,7 @@ import (
 	"bookget/site/China/ouroots"
 	"bookget/site/China/rbkdocnpmtw"
 	"bookget/site/China/sclib"
+	"bookget/site/China/sdutcm"
 	"bookget/site/China/szlib"
 	"bookget/site/China/tianyige"
 	"bookget/site/China/twnlc"
@@ -169,6 +170,15 @@ type GujiYnutcm struct{}
 func (p GujiYnutcm) getRouterInit(sUrl []string) (map[string]interface{}, error) {
 	for i, s := range sUrl {
 		ynutcm.Init(i+1, s)
+	}
+	return nil, nil
+}
+
+type Sdutcm struct{}
+
+func (p Sdutcm) getRouterInit(sUrl []string) (map[string]interface{}, error) {
+	for i, s := range sUrl {
+		sdutcm.Init(i+1, s)
 	}
 	return nil, nil
 }

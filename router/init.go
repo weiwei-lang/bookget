@@ -74,6 +74,8 @@ func FactoryRouter(siteID string, sUrl []string) (map[string]interface{}, error)
 		Router["www.ncpssd.org"] = new(Ncpssd)
 		//[中国]云南中医药大学古籍图书馆
 		Router["guji.ynutcm.edu.cn"] = new(GujiYnutcm)
+		//山东中医药大学古籍数字图书馆
+		Router["gjsztsg.sdutcm.edu.cn"] = new(Sdutcm)
 		//}}} -----------------------------------------------------------------
 
 		//---------------日本--------------------------------------------------
