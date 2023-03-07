@@ -1,15 +1,17 @@
 package familysearch
 
-type Downloader struct {
-	Index    int
-	Url      string
-	Domain   string
-	SavePath string
-	BookId   string
-	UrlType  uint8 //URL类型识别，同一个站有多种URL
+import "net/url"
+
+type DownloadTask struct {
+	Index     int
+	Url       string
+	UrlParsed *url.URL
+	SavePath  string
+	BookId    string
+	UrlType   uint8 //URL类型识别，同一个站有多种URL
 }
 
-//{"type":"image-data","args":{"imageURL":"https://www.familysearch.org/ark:/61903/3:1:3QSQ-G97V-BRNQ?cc=1787988&wc=3XLV-ZVP:1022211401,1021934502,1021934702,1021936102,1022506101","state":{"wc":"3XPX-Y4M:1022211401,1021934502,1021934702,1021936102,1022505901","cc":"1787988","imageOrFilmUrl":"/ark:/61903/3:1:3QS7-L97V-7XZ3","collectionContext":"1787988","viewMode":"i","selectedImageIndex":-1,"waypointContext":"/service/cds/recapi/waypoints/3XPX-Y4M:1022211401,1021934502,1021934702,1021936102,1022505901"},"locale":"zh"}}
+// {"type":"image-data","args":{"imageURL":"https://www.familysearch.org/ark:/61903/3:1:3QSQ-G97V-BRNQ?cc=1787988&wc=3XLV-ZVP:1022211401,1021934502,1021934702,1021936102,1022506101","state":{"wc":"3XPX-Y4M:1022211401,1021934502,1021934702,1021936102,1022505901","cc":"1787988","imageOrFilmUrl":"/ark:/61903/3:1:3QS7-L97V-7XZ3","collectionContext":"1787988","viewMode":"i","selectedImageIndex":-1,"waypointContext":"/service/cds/recapi/waypoints/3XPX-Y4M:1022211401,1021934502,1021934702,1021936102,1022505901"},"locale":"zh"}}
 type ImageData struct {
 	Type string `json:"type"`
 	Args struct {
@@ -27,7 +29,7 @@ type ImageData struct {
 	} `json:"args"`
 }
 
-//{"type":"film-data","args":{"dgsNum":"005547019","state":{"imageOrFilmUrl":"","viewMode":"i","selectedImageIndex":-1},"locale":"zh"}}
+// {"type":"film-data","args":{"dgsNum":"005547019","state":{"imageOrFilmUrl":"","viewMode":"i","selectedImageIndex":-1},"locale":"zh"}}
 type FilmData struct {
 	Type string `json:"type"`
 	Args struct {
@@ -69,7 +71,7 @@ type ResultError struct {
 	} `json:"error"`
 }
 
-//家谱图像 https://www.familysearch.org/records/images/api/imageDetails/groups/M94F-78D?properties&changeLog&coverageIndex=null
+// 家谱图像 https://www.familysearch.org/records/images/api/imageDetails/groups/M94F-78D?properties&changeLog&coverageIndex=null
 type Canvases struct {
 	ImageUrls []string
 	IiifUrls  []string

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -36,7 +37,7 @@ func GetHeaderFile(srcPath string) (header map[string]string, err error) {
 			continue
 		}
 		if "cookie" == strings.ToLower(k) {
-			header["Cookie"] = v
+			header["Cookie"] = CookieEscape(v)
 		} else if "user-agent" == strings.ToLower(k) {
 			header["User-Agent"] = v
 		} else {
@@ -44,6 +45,20 @@ func GetHeaderFile(srcPath string) (header map[string]string, err error) {
 		}
 	}
 	return header, nil
+}
+
+func CookieEscape(text string) string {
+	matches := regexp.MustCompile(`([^=]+)\=([^;]+);`).FindAllStringSubmatch(text, -1)
+	if matches == nil {
+		return text
+	}
+	cookieText := ""
+	for _, m := range matches {
+		k := m[1]
+		v := m[2]
+		cookieText += k + "=" + url.QueryEscape(v) + ";"
+	}
+	return cookieText
 }
 
 func HttpCookie2String(cookie []*http.Cookie) string {

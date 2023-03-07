@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 var API_URL = "https://www.familysearch.org/search/filmdata/filmdatainfo"
@@ -25,39 +25,41 @@ var CookieJar *cookiejar.Jar
 
 func Init(iTask int, sUrl string) (msg string, err error) {
 	CookieJar, _ = cookiejar.New(nil)
-	dl := new(Downloader)
-	dl.Domain = util.GetHostUrl(sUrl)
-	dl.Url = sUrl
-	dl.Index = iTask
-	dl.BookId = getBookId(dl)
-	dl.SavePath = config.CreateDirectory(dl.Url, dl.BookId)
-	if dl.UrlType == 1 {
-		return ImagesDownload(dl)
+	dt := new(DownloadTask)
+	dt.UrlParsed, err = url.Parse(sUrl)
+	dt.Url = sUrl
+	dt.Index = iTask
+	dt.BookId = getBookId(dt)
+	dt.SavePath = config.CreateDirectory(dt.Url, dt.BookId)
+	if dt.UrlType == 1 {
+		return ImagesDownload(dt)
 	}
-	return download(dl)
+	return Download(dt)
 }
 
-func download(t *Downloader) (msg string, err error) {
-	name := util.GenNumberSorted(t.Index)
-	log.Printf("Get %s  %s\n", name, t.Url)
+func Download(dt *DownloadTask) (msg string, err error) {
+	name := util.GenNumberSorted(dt.Index)
+	log.Printf("Get %s  %s\n", name, dt.Url)
 
-	imageData, err := getImageData(t.Url, config.Conf.CookieFile)
+	imageData, err := getImageData(dt.Url, config.Conf.CookieFile)
 	if err != nil {
 		return "", err
 	}
-	filmData, err := getFilmData(t.Url, imageData.DgsNum, config.Conf.CookieFile)
+	filmData, err := getFilmData(dt.Url, imageData.DgsNum, config.Conf.CookieFile)
 	if err != nil {
 		return "", err
 	}
-	//用户自定义起始页
 	size := len(filmData.Images)
 	log.Printf(" %d Pages.\n", size)
 
-	//cookie 处理
-	jar, _ := cookiejar.New(nil)
 	//{id} = 3:1:3QSQ-G9SM-C8SC
 	//{image} = image.xml 或 dist.jpg?proxy=true
-	createShell(t.SavePath, &filmData, config.Conf.CookieFile)
+	iifDown(dt, filmData, config.Conf.CookieFile)
+	return "", nil
+}
+
+func dasDown(dt *DownloadTask, filmData ResultFilmData) {
+	jar, _ := cookiejar.New(nil)
 	//filmData.Templates.DasTemplate
 	//https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/{id}/{image}
 	dasTemplate := regexp.MustCompile(`\{[A-z]+\}`).ReplaceAllString(filmData.Templates.DasTemplate, "%s")
@@ -72,10 +74,9 @@ func download(t *Downloader) (msg string, err error) {
 		sortId := util.GenNumberSorted(index + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
 		fileName := sortId + ".jpg"
-		dest := config.GetDestPath(t.Url, t.BookId, fileName)
-
+		dest := config.GetDestPath(dt.Url, dt.BookId, fileName)
 		for {
-			_, err = gohttp.FastGet(dUrl, gohttp.Options{
+			_, err := gohttp.FastGet(dUrl, gohttp.Options{
 				DestFile:    dest,
 				Overwrite:   false,
 				Concurrency: config.Conf.Threads,
@@ -87,60 +88,59 @@ func download(t *Downloader) (msg string, err error) {
 			})
 			if err != nil {
 				fmt.Println(err)
-				for t := 60; t > 0; t-- {
-					seconds := strconv.Itoa(t)
-					if t < 10 {
-						seconds = fmt.Sprintf("0%d", t)
-					}
-					fmt.Printf("\rServer: maximum download limit exceeded...please wait.... [00:%s of appr. Max 1 min]", seconds)
-					time.Sleep(time.Second)
-				}
-				fmt.Println()
+				util.PrintSleepTime(60)
 				continue
 			}
 			break
 		}
+		util.PrintSleepTime(config.Conf.Speed)
 	}
-
-	return "", nil
 }
 
-func createShell(destPath string, filmData *ResultFilmData, cookieFile string) {
+func iifDown(dt *DownloadTask, filmData ResultFilmData, cookieFile string) {
 	//filmData.Templates.DzTemplate
 	//https://sg30p0.familysearch.org/service/records/storage/deepzoomcloud/dz/v1/{id}/{image}
 	dzTpl := regexp.MustCompile(`\{[A-z]+\}`).ReplaceAllString(filmData.Templates.DzTemplate, "%s")
-	dziUrl := make([]string, 0, len(filmData.Images))
-	for _, image := range filmData.Images {
+	header, _ := curl.GetHeaderFile(cookieFile)
+	args := []string{"--dezoomer=deepzoom",
+		"-H", "authority:www.familysearch.org",
+		"-H", "referer:" + dt.Url,
+		"-H", "User-Agent:" + header["User-Agent"],
+		"-H", "cookie:" + header["Cookie"],
+	}
+	storePath := dt.SavePath + string(os.PathSeparator)
+	for i, image := range filmData.Images {
 		m := regexp.MustCompile(`/([^/]+)/image.xml`).FindStringSubmatch(image)
 		if m == nil {
 			continue
 		}
 		id := m[1]
-		dUrl := fmt.Sprintf(dzTpl, id, "image.xml")
-		dziUrl = append(dziUrl, dUrl)
+		sortId := util.GenNumberSorted(i + 1)
+		inputUri := fmt.Sprintf(dzTpl, id, "image.xml")
+		log.Printf("Get %s  %s\n", sortId, inputUri)
+		outfile := storePath + sortId + config.Conf.FileExt
+		util.StartProcess(inputUri, outfile, args)
+		util.PrintSleepTime(config.Conf.Speed)
 	}
-	header, _ := curl.GetHeaderFile(cookieFile)
-	util.CreateShell(destPath, dziUrl, header)
-
 	return
 }
 
-func getBookId(dl *Downloader) string {
+func getBookId(dt *DownloadTask) string {
 	bookId := ""
-	m := regexp.MustCompile(`wc=([^&]+)`).FindStringSubmatch(dl.Url)
+	m := regexp.MustCompile(`(?i)wc=([^&]+)`).FindStringSubmatch(dt.Url)
 	if m != nil {
 		bookId = strconv.FormatUint(uint64(zhash.CRC32(m[1])), 10)
-		dl.UrlType = 0 //中國族譜收藏 1239-2014年 https://www.familysearch.org/search/collection/1787988
+		dt.UrlType = 0 //中國族譜收藏 1239-2014年 https://www.familysearch.org/search/collection/1787988
 	}
-	m = regexp.MustCompile(`rmsId=([A-z\d-_]+)`).FindStringSubmatch(dl.Url)
+	m = regexp.MustCompile(`(?i)rmsId=([A-z\d-_]+)`).FindStringSubmatch(dt.Url)
 	if m != nil {
 		bookId = m[1]
-		dl.UrlType = 1 //家谱图像 https://www.familysearch.org/records/images/
+		dt.UrlType = 1 //家谱图像 https://www.familysearch.org/records/images/
 	}
-	m = regexp.MustCompile(`groupId=([A-z\d-_]+)`).FindStringSubmatch(dl.Url)
+	m = regexp.MustCompile(`(?i)groupId=([A-z\d-_]+)`).FindStringSubmatch(dt.Url)
 	if m != nil {
 		bookId = m[1]
-		dl.UrlType = 1 //家谱图像 https://www.familysearch.org/ark:/61903/3:1:3QS7-L9S9-WS92?view=explore&groupId=M94X-6HR
+		dt.UrlType = 1 //家谱图像 https://www.familysearch.org/ark:/61903/3:1:3QS7-L9S9-WS92?view=explore&groupId=M94X-6HR
 	}
 	return bookId
 }

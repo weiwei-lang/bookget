@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -54,20 +55,24 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	sortId := fmt.Sprintf("%s.json", dt.BookId)
 	dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 
-	log.Printf("Create a new file %s \n", sortId)
 	util.FileWrite([]byte(dziJson), dest)
 
-	config.Conf.FileExt = "." + dziFormat.Format
 	dziUrls := make([]string, 0)
 	dziUrls = append(dziUrls, sortId)
 
-	header := make(map[string]string, 4)
-	header["Origin"] = fmt.Sprintf("https://%s", dt.UrlParsed.Host)
-	header["Referer"] = fmt.Sprintf("https://%s", dt.UrlParsed.Host)
-	header["User-Agent"] = config.Conf.UserAgent
-
-	util.CreateShell(dt.SavePath, dziUrls, header)
-	return "请手动运行 dezoomify-rs.urls 文件", nil
+	referer := fmt.Sprintf("https://%s", dt.UrlParsed.Host)
+	args := []string{"--dezoomer=deepzoom",
+		"-H", "Origin:" + referer,
+		"-H", "Referer:" + referer,
+		"-H", "User-Agent:" + config.Conf.UserAgent,
+	}
+	storePath := dt.SavePath + string(os.PathSeparator)
+	ext := "." + dziFormat.Format
+	outfile := storePath + dt.BookId + ext
+	if ret := util.StartProcess(dest, outfile, args); ret == true {
+		os.Remove(dest)
+	}
+	return "", nil
 }
 
 func getBookId(text string) string {

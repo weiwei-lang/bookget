@@ -9,38 +9,54 @@ import (
 	"log"
 	"net/http/cookiejar"
 	"net/url"
-	"strconv"
+	"os"
 	"strings"
-	"time"
 )
 
 // 家谱图像 https://www.familysearch.org/records/images/
-func ImagesDownload(t *Downloader) (msg string, err error) {
+func ImagesDownload(dt *DownloadTask) (msg string, err error) {
 
-	name := util.GenNumberSorted(t.Index)
-	log.Printf("Get %s  %s\n", name, t.Url)
+	name := util.GenNumberSorted(dt.Index)
+	log.Printf("Get %s  %s\n", name, dt.Url)
 
-	canvases, err := getCanvases(t.BookId, config.Conf.CookieFile)
+	canvases, err := getCanvases(dt.BookId, config.Conf.CookieFile)
 	if err != nil {
 		return "", err
 	}
 	//用户自定义起始页
 	log.Printf(" %d Pages.\n", canvases.Size)
 
-	//cookie 处理
-	jar, _ := cookiejar.New(nil)
 	header, _ := curl.GetHeaderFile(config.Conf.CookieFile)
-	util.CreateShell(t.SavePath, canvases.IiifUrls, header)
-	for i, dUrl := range canvases.ImageUrls {
+	args := []string{"--dezoomer=deepzoom",
+		"-H", "authority:www.familysearch.org",
+		"-H", "referer:" + url.QueryEscape(dt.Url),
+		"-H", "User-Agent:" + header["User-Agent"],
+		"-H", "cookie:" + header["Cookie"],
+	}
+	storePath := dt.SavePath + string(os.PathSeparator)
+	for i, inputUri := range canvases.IiifUrls {
+		sortId := util.GenNumberSorted(i + 1)
+		log.Printf("Get %s  %s\n", sortId, inputUri)
+		outfile := storePath + sortId + config.Conf.FileExt
+		util.StartProcess(inputUri, outfile, args)
+		util.PrintSleepTime(config.Conf.Speed)
+	}
+
+	return "", nil
+}
+
+func dasImageDown(dt *DownloadTask, imageUrls []string) {
+	jar, _ := cookiejar.New(nil)
+	for i, dUrl := range imageUrls {
 		if dUrl == "" {
 			continue
 		}
 		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, dUrl)
-		fileName := sortId + ".jpg"
-		dest := config.GetDestPath(t.Url, t.BookId, fileName)
+		fileName := sortId + config.Conf.FileExt
+		dest := config.GetDestPath(dt.Url, dt.BookId, fileName)
 		for {
-			_, err = gohttp.FastGet(dUrl, gohttp.Options{
+			_, err := gohttp.FastGet(dUrl, gohttp.Options{
 				DestFile:    dest,
 				Overwrite:   false,
 				Concurrency: config.Conf.Threads,
@@ -52,22 +68,14 @@ func ImagesDownload(t *Downloader) (msg string, err error) {
 			})
 			if err != nil {
 				fmt.Println(err)
-				for t := 60; t > 0; t-- {
-					seconds := strconv.Itoa(t)
-					if t < 10 {
-						seconds = fmt.Sprintf("0%d", t)
-					}
-					fmt.Printf("\rServer: maximum download limit exceeded...please wait.... [00:%s of appr. Max 1 min]", seconds)
-					time.Sleep(time.Second)
-				}
-				fmt.Println()
+				util.PrintSleepTime(60)
 				continue
 			}
 			break
 		}
+		util.PrintSleepTime(config.Conf.Speed)
 	}
 
-	return "", nil
 }
 
 func getCanvases(bookId, cookieFile string) (Canvases, error) {

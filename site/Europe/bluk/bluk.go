@@ -2,10 +2,13 @@ package bluk
 
 import (
 	"bookget/config"
-	"bookget/lib/curl"
+	"bookget/lib/gohttp"
 	util "bookget/lib/util"
 	"fmt"
 	"log"
+	"net/http/cookiejar"
+	"net/url"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -27,12 +30,34 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	canvases := getImageUrls(taskUrl)
 	log.Printf(" %d pages.\n", canvases.Size)
 	destPath := config.CreateDirectory(taskUrl, bookId)
-	util.CreateShell(destPath, canvases.IiifUrls, nil)
-	fmt.Println("Please run the file [dezoomify-rs.urls] to start the download.")
+
+	args := []string{"--dezoomer=deepzoom",
+		"-H", "Origin:" + url.QueryEscape(taskUrl),
+		"-H", "Referer:" + url.QueryEscape(taskUrl),
+		"-H", "User-Agent:" + config.Conf.UserAgent,
+	}
+	storePath := destPath + string(os.PathSeparator)
+	for i, uri := range canvases.IiifUrls {
+		sortId := util.GenNumberSorted(i + 1)
+		log.Printf("Get %s  %s\n", sortId, uri)
+		outfile := storePath + sortId + config.Conf.FileExt
+		util.StartProcess(uri, outfile, args)
+	}
 }
 
 func getImageUrls(taskUrl string) (canvases Canvases) {
-	bs, err := curl.GetRedirects(taskUrl, nil, 3)
+	jar, _ := cookiejar.New(nil)
+	resp, err := gohttp.Get(taskUrl, gohttp.Options{
+		Headers: map[string]interface{}{
+			"User-Agent": config.Conf.UserAgent,
+		},
+		CookieFile: config.Conf.CookieFile,
+		CookieJar:  jar,
+	})
+	if err != nil {
+		return
+	}
+	bs, err := resp.GetBody()
 	if err != nil {
 		return
 	}

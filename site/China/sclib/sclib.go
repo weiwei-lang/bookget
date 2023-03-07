@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"regexp"
 	"sort"
 	"strconv"
@@ -65,26 +66,40 @@ func Download(dt *DownloadTask) (msg string, err error) {
 }
 `
 	dziUrls := make([]string, 0, len(respBody.Tiles))
+	ext := ""
 	for key, item := range respBody.Tiles {
 		k := regexp.MustCompile(`(\d+)`).FindString(key)
 		i, _ := strconv.Atoi(k)
 		sortId := fmt.Sprintf("%s.json", util.GenNumberSorted(i))
 		dest := config.GetDestPath(dt.Url, dt.BookId, sortId)
 		serverUrl := fmt.Sprintf("%s/tiles/%s/", apiServer, key)
-
+		if ext == "" {
+			ext = "." + strings.ToLower(item.Extension)
+		}
 		jsonText := ""
 		if item.TileSize.W == 0 {
 			jsonText = fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize2.Width, item.Height, item.Width)
 		} else {
 			jsonText = fmt.Sprintf(text, serverUrl, item.Extension, item.TileSize.W, item.Height, item.Width)
 		}
-		log.Printf("Create a new file %s \n", sortId)
 		util.FileWrite([]byte(jsonText), dest)
 		dziUrls = append(dziUrls, sortId)
 	}
 	sort.Sort(strs(dziUrls))
-	util.CreateShell(dt.SavePath, dziUrls, nil)
-	return "请手动运行 dezoomify-rs.urls 文件", nil
+	storePath := dt.SavePath + string(os.PathSeparator)
+	args := []string{"--dezoomer=deepzoom",
+		"-H", "Origin:" + url.QueryEscape(dt.Url),
+		"-H", "Referer:" + url.QueryEscape(dt.Url),
+		"-H", "User-Agent:" + config.Conf.UserAgent,
+	}
+	for i, val := range dziUrls {
+		inputUri := storePath + val
+		outfile := storePath + util.GenNumberSorted(i+1) + ext
+		if ret := util.StartProcess(inputUri, outfile, args); ret == true {
+			os.Remove(inputUri)
+		}
+	}
+	return "", nil
 }
 
 func getApiServer(bookId string, u *url.URL) string {
