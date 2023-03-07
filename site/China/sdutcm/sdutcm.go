@@ -48,7 +48,7 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		}
 		csPath := crypt.EncodeURI(respBody.Url)
 		pdfUrl := "https://gjsztsg.sdutcm.edu.cn/getFtpPdfFile.jspx?fileName=" + csPath + token
-		sortId := util.GenNumberSorted(i + 1)
+		sortId := util.GenNumberSorted(i)
 		log.Printf("Get %d/%d  %s\n", i, canvases.Size, pdfUrl)
 		filename := sortId + ".pdf"
 		dest := config.GetDestPath(dt.Url, dt.BookId, filename)
