@@ -2,6 +2,7 @@ package sdutcm
 
 import (
 	"bookget/config"
+	"bookget/lib/crypt"
 	"bookget/lib/gohttp"
 	"bookget/lib/util"
 	"encoding/json"
@@ -45,9 +46,8 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		if err = json.Unmarshal(bs, &respBody); err != nil {
 			break
 		}
-		csPath := strings.Replace(url.PathEscape(respBody.Url), "%2F", "/", -1)
+		csPath := crypt.EncodeURI(respBody.Url)
 		pdfUrl := "https://gjsztsg.sdutcm.edu.cn/getFtpPdfFile.jspx?fileName=" + csPath + token
-
 		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %d/%d  %s\n", i, canvases.Size, pdfUrl)
 		filename := sortId + ".pdf"
