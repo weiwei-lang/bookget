@@ -2,6 +2,7 @@ package main
 
 import (
 	"bookget/config"
+	"bookget/router"
 	"bufio"
 	"context"
 	"fmt"
@@ -11,8 +12,6 @@ import (
 	"strings"
 )
 
-var Site = SiteMap{}
-
 func main() {
 	ctx := context.Background()
 
@@ -20,8 +19,6 @@ func main() {
 	if !config.Init(ctx) {
 		os.Exit(0)
 	}
-	//注册站点
-	RegisterCommand()
 
 	//单个URL
 	if config.Conf.DUrl != "" {
@@ -69,17 +66,24 @@ func main() {
 	log.Printf("下载完成，共 %d 个任务，请到 %s 目录下查看。\n", iCount, config.Conf.SaveFolder)
 }
 
-func ExecuteCommand(ctx context.Context, i int, text string) {
-	text = strings.Trim(text, "\r\n")
-	u, err := url.Parse(text)
-	if err != nil {
+func ExecuteCommand(ctx context.Context, i int, sUrl string) {
+	if sUrl == "" || !strings.HasPrefix(sUrl, "http") {
+		fmt.Println("URL Not found.")
 		return
 	}
-	msg, err := Site.Execute(u.Host, i, text)
+	sUrl = strings.Trim(sUrl, "\r\n")
+	u, err := url.Parse(sUrl)
+	if err != nil {
+		fmt.Printf("URL Error:%+v\n", err)
+		return
+	}
+	msg, err := router.FactoryRouter(u.Host, []string{sUrl})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(msg)
+	if msg != nil {
+		fmt.Printf("%+v\n", msg)
+	}
 	return
 }
