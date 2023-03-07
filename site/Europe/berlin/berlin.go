@@ -4,6 +4,7 @@ import (
 	"bookget/config"
 	"bookget/lib/gohttp"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -35,28 +36,13 @@ func StartDownload(pageUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 
-	destPath := config.CreateDirectory(pageUrl, bookId)
-	util.CreateShell(destPath, canvases.IiifUrls, nil)
-
-	for i, uri := range canvases.ImgUrls {
-		ext := util.FileExt(uri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, uri)
-		filename := sortId + ext
-		dest := config.GetDestPath(pageUrl, bookId, filename)
-
-		gohttp.FastGet(uri, gohttp.Options{
-			DestFile:    dest,
-			Overwrite:   false,
-			Concurrency: 1,
-			CookieFile:  config.Conf.CookieFile,
-			Headers: map[string]interface{}{
-				"user-agent": config.UserAgent,
-			},
-		})
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		iiif.DziDownload(pageUrl, bookId, canvases.IiifUrls)
+	} else {
+		iiif.NormalDownload(pageUrl, bookId, canvases.ImgUrls)
 	}
 	return
-
 }
 
 func getCanvases(bookId string) (canvases Canvases) {

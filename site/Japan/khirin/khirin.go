@@ -4,6 +4,7 @@ import (
 	"bookget/config"
 	curl "bookget/lib/curl"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -68,18 +69,11 @@ func startDownload(pageUrl, bookId string) {
 		return
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
-	destPath := config.CreateDirectory(pageUrl, bookId)
-	util.CreateShell(destPath, canvases.IiifUrls, nil)
-	for i, uri := range canvases.ImgUrls {
-		if uri == "" {
-			continue
-		}
-		ext := util.FileExt(uri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, uri)
-		fileName := sortId + ext
-		dest := config.GetDestPath(pageUrl, bookId, fileName)
-		curl.FastGet(uri, dest, nil, true)
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		iiif.DziDownload(pageUrl, bookId, canvases.IiifUrls)
+	} else {
+		iiif.NormalDownload(pageUrl, bookId, canvases.ImgUrls)
 	}
 }
 

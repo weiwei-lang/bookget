@@ -3,8 +3,8 @@ package kyoto
 import (
 	"bookget/config"
 	"bookget/lib/curl"
-	"bookget/lib/gohttp"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -22,34 +22,19 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 	return "", err
 }
 
-func StartDownload(iTask int, text, bookId string) {
+func StartDownload(iTask int, pageUrl, bookId string) {
 	name := util.GenNumberSorted(iTask)
-	log.Printf("Get %s  %s\n", name, text)
+	log.Printf("Get %s  %s\n", name, pageUrl)
 
-	pages, iiifInfo := getPages(bookId)
-	log.Printf(" %d pages.\n", len(pages))
+	imageUrls, iiifUrls := getPages(bookId)
+	log.Printf(" %d pages.\n", len(imageUrls))
 
-	destPath := config.CreateDirectory(text, bookId)
-	util.CreateShell(destPath, iiifInfo, nil)
-	for i, uri := range pages {
-		if uri == "" {
-			continue
-		}
-		ext := util.FileExt(uri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, uri)
-		fileName := sortId + ext
-		dest := config.GetDestPath(text, bookId, fileName)
-		gohttp.FastGet(uri, gohttp.Options{
-			DestFile:    dest,
-			Overwrite:   false,
-			Concurrency: config.Conf.Threads,
-			Headers: map[string]interface{}{
-				"user-agent": config.UserAgent,
-			},
-		})
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		iiif.DziDownload(pageUrl, bookId, iiifUrls)
+	} else {
+		iiif.NormalDownload(pageUrl, bookId, imageUrls)
 	}
-
 }
 
 func getPages(bookId string) (pages []string, iiifInfo []string) {

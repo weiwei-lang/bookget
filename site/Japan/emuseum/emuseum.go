@@ -3,8 +3,8 @@ package emuseum
 import (
 	"bookget/config"
 	"bookget/lib/curl"
-	"bookget/lib/gohttp"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -26,33 +26,18 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 	return "", err
 }
 
-func StartDownload(num int, uri, bookId string) {
+func StartDownload(num int, pageUrl, bookId string) {
 	name := util.GenNumberSorted(num)
-	log.Printf("Get %s  %s\n", name, uri)
+	log.Printf("Get %s  %s\n", name, pageUrl)
 
-	pages, iiifInfo := getPages(uri)
+	pages, iiifInfo := getPages(pageUrl)
 	log.Printf(" %d pages.\n", len(pages))
 
-	destPath := config.CreateDirectory(uri, bookId)
-	util.CreateShell(destPath, iiifInfo, nil)
-
-	for i, imgUri := range pages {
-		if imgUri == "" {
-			continue
-		}
-		ext := util.FileExt(imgUri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, imgUri)
-		fileName := sortId + ext
-		dest := config.GetDestPath(uri, bookId, fileName)
-		gohttp.FastGet(imgUri, gohttp.Options{
-			DestFile:    dest,
-			Overwrite:   false,
-			Concurrency: config.Conf.Threads,
-			Headers: map[string]interface{}{
-				"user-agent": config.UserAgent,
-			},
-		})
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		iiif.DziDownload(pageUrl, bookId, iiifInfo)
+	} else {
+		iiif.NormalDownload(pageUrl, bookId, pages)
 	}
 }
 

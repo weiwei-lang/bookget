@@ -28,6 +28,7 @@ type Input struct {
 	MergePDFs          bool   //;台北故宫博物院 - 善本古籍，是否整册合并一个PDF下载？0=否，1=是。整册合并一个PDF遇到某一册最后一章节【无影像】会导致下载失败。 如：新刊校定集注杜詩 三十六卷 第二十四冊 聞惠子過東溪 无影像
 	DezoomifyPath      string //dezoomify-rs 本地目录位置
 	DezoomifyRs        string //dezoomify-rs 参数
+	UseDziRs           bool   //启用DezoomifyRs下载IIIF
 	FileExt            string //指定下载的扩展名
 	Threads            uint
 	Help               bool
@@ -47,7 +48,8 @@ func Init(ctx context.Context) bool {
 	flag.BoolVar(&Conf.UseNumericFilename, "fn", true, "保存文件名规则。可选值[0|1]。0=中文名，1=数字名。仅对 read.nlc.cn 有效。")
 	flag.StringVar(&Conf.UserAgent, "ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0", "user-agent")
 	flag.BoolVar(&Conf.MergePDFs, "mp", false, "合并PDF文件下载，可选值[0|1]。0=否，1=是。仅对 rbk-doc.npm.edu.tw 有效。")
-	flag.BoolVar(&Conf.UseCDN, "cdn", true, "使用CDN加速，可选值[0|1]。0=否，1=是。仅对 www.loc.gov 有效。")
+	flag.BoolVar(&Conf.UseCDN, "cdn", true, "使用CDN加速，仅对 www.loc.gov 有效。")
+	flag.BoolVar(&Conf.UseDziRs, "dzi", false, "使用dezoomify-rs下载，仅对支持iiif的网站生效。")
 	flag.StringVar(&Conf.CookieFile, "c", "", "指定cookie.txt文件路径")
 	flag.StringVar(&Conf.FileExt, "ext", ".jpg", "指定文件扩展名[.jpg|.tif|.png]等")
 	c := uint(runtime.NumCPU() * 2)

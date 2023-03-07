@@ -4,6 +4,7 @@ import (
 	"bookget/config"
 	curl "bookget/lib/curl"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -21,29 +22,22 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 	return "", err
 }
 
-func StartDownload(iTask int, taskUrl, bookId string) {
+func StartDownload(iTask int, pageUrl, bookId string) {
 	name := util.GenNumberSorted(iTask)
-	log.Printf("Get %s  %s\n", name, taskUrl)
+	log.Printf("Get %s  %s\n", name, pageUrl)
 
-	imageUrls, iiifUrls := getImageUrls(bookId, taskUrl)
+	imageUrls, iiifUrls := getImageUrls(bookId, pageUrl)
 	if imageUrls == nil || iiifUrls == nil {
 		return
 	}
 	size := len(imageUrls)
 	log.Printf(" %d pages.\n", size)
 
-	destPath := config.CreateDirectory(taskUrl, bookId)
-	util.CreateShell(destPath, iiifUrls, nil)
-	for i, uri := range imageUrls {
-		if uri == "" {
-			continue
-		}
-		ext := util.FileExt(uri)
-		sortId := util.GenNumberSorted(i + 1)
-		log.Printf("Get %s  %s\n", sortId, uri)
-		fileName := sortId + ext
-		dest := config.GetDestPath(taskUrl, bookId, fileName)
-		curl.FastGet(uri, dest, nil, true)
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		iiif.DziDownload(pageUrl, bookId, iiifUrls)
+	} else {
+		iiif.NormalDownload(pageUrl, bookId, imageUrls)
 	}
 }
 

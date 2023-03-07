@@ -5,6 +5,7 @@ import (
 	curl "bookget/lib/curl"
 	"bookget/lib/gohttp"
 	util "bookget/lib/util"
+	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -52,33 +53,11 @@ func Download(dt *DownloadTask) (msg string, err error) {
 			continue
 		}
 		volPath := fmt.Sprintf("%s_volume%d", dt.BookId, k+1)
-		//iif shell
-		destPath := config.CreateDirectory(vol, volPath)
-		util.CreateShell(destPath, canvases.IiifUrls, nil)
-
-		//download it
-		for i, uri := range canvases.ImgUrls {
-			if uri == "" || err != nil {
-				continue
-			}
-			ext := util.FileExt(uri)
-			sortId := util.GenNumberSorted(i + 1)
-			log.Printf("Get %s  %s\n", sortId, uri)
-			filename := sortId + ext
-			dest := config.GetDestPath(uri, volPath, filename)
-			opts := gohttp.Options{
-				DestFile:    dest,
-				Overwrite:   false,
-				Concurrency: 1,
-				CookieFile:  config.Conf.CookieFile,
-				Headers: map[string]interface{}{
-					"User-Agent": config.Conf.UserAgent,
-				},
-			}
-			_, err := gohttp.FastGet(uri, opts)
-			if err != nil {
-				fmt.Println(err)
-			}
+		config.CreateDirectory(vol, volPath)
+		if config.Conf.UseDziRs {
+			iiif.DziDownload(vol, volPath, canvases.IiifUrls)
+		} else {
+			iiif.NormalDownload(vol, volPath, canvases.ImgUrls)
 		}
 	}
 	return "", err

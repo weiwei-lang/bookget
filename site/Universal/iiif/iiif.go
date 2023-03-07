@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 )
 
@@ -36,9 +37,41 @@ func StartDownload(pageUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 
-	destPath := config.CreateDirectory(pageUrl, bookId)
-	util.CreateShell(destPath, canvases.IiifUrls, nil)
-	for i, uri := range canvases.ImgUrls {
+	config.CreateDirectory(pageUrl, bookId)
+	if config.Conf.UseDziRs {
+		DziDownload(pageUrl, bookId, canvases.IiifUrls)
+	} else {
+		NormalDownload(pageUrl, bookId, canvases.ImgUrls)
+	}
+}
+
+func DziDownload(pageUrl, bookId string, iiifUrls []string) {
+	if iiifUrls == nil {
+		return
+	}
+	referer := url.QueryEscape(pageUrl)
+	args := []string{
+		"-H", "Origin:" + referer,
+		"-H", "Referer:" + referer,
+		"-H", "User-Agent:" + config.Conf.UserAgent,
+	}
+	for i, uri := range iiifUrls {
+		if uri == "" {
+			continue
+		}
+		sortId := util.GenNumberSorted(i + 1)
+		log.Printf("Get %s  %s\n", sortId, uri)
+		filename := sortId + config.Conf.FileExt
+		dest := config.GetDestPath(pageUrl, bookId, filename)
+		util.StartProcess(uri, dest, args)
+	}
+}
+
+func NormalDownload(pageUrl, bookId string, imgUrls []string) {
+	if imgUrls == nil {
+		return
+	}
+	for i, uri := range imgUrls {
 		if uri == "" {
 			continue
 		}
