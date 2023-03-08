@@ -19,6 +19,9 @@ func Init(iTask int, taskUrl string) (msg string, err error) {
 	taskName := util.GenNumberSorted(iTask)
 	log.Printf("Get %s  %s\n", taskName, taskUrl)
 	for i, tUrl := range taskUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		bookId := getBookId(tUrl)
 		if bookId == "" {
 			continue

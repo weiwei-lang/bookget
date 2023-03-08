@@ -54,8 +54,8 @@ func CookieEscape(text string) string {
 	}
 	cookieText := ""
 	for _, m := range matches {
-		k := m[1]
-		v := m[2]
+		k := strings.TrimSpace(m[1])
+		v := strings.TrimSpace(m[2])
 		cookieText += k + "=" + url.QueryEscape(v) + ";"
 	}
 	return cookieText

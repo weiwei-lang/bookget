@@ -30,6 +30,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 		return
 	}
 	for i, uri := range bookUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

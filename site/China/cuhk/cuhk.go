@@ -59,6 +59,9 @@ func do(bookId, bookUrl string) {
 	log.Printf(" %d pages.\n", size)
 	sCookie := curl.HttpCookie2String(cookies)
 	for i, v := range imagePages {
+		if config.SeqContinue(i) {
+			continue
+		}
 		imgUrl := formateUrl(v.Pid)
 		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, imgUrl)

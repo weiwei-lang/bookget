@@ -104,12 +104,15 @@ func iifDown(dt *DownloadTask, filmData ResultFilmData, cookieFile string) {
 	header, _ := curl.GetHeaderFile(cookieFile)
 	args := []string{"--dezoomer=deepzoom",
 		"-H", "authority:www.familysearch.org",
-		"-H", "referer:" + dt.Url,
+		"-H", "referer:" + url.QueryEscape(dt.Url),
 		"-H", "User-Agent:" + header["User-Agent"],
 		"-H", "cookie:" + header["Cookie"],
 	}
 	storePath := dt.SavePath + string(os.PathSeparator)
 	for i, image := range filmData.Images {
+		if config.SeqContinue(i) {
+			continue
+		}
 		m := regexp.MustCompile(`/([^/]+)/image.xml`).FindStringSubmatch(image)
 		if m == nil {
 			continue

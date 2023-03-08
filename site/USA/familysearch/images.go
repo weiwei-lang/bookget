@@ -35,6 +35,9 @@ func ImagesDownload(dt *DownloadTask) (msg string, err error) {
 	}
 	storePath := dt.SavePath + string(os.PathSeparator)
 	for i, inputUri := range canvases.IiifUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, inputUri)
 		outfile := storePath + sortId + config.Conf.FileExt
@@ -48,6 +51,9 @@ func ImagesDownload(dt *DownloadTask) (msg string, err error) {
 func dasImageDown(dt *DownloadTask, imageUrls []string) {
 	jar, _ := cookiejar.New(nil)
 	for i, dUrl := range imageUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if dUrl == "" {
 			continue
 		}

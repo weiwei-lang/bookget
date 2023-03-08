@@ -40,6 +40,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	log.Printf(" %d pages.\n", size)
 
 	for i, uri := range pdfUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

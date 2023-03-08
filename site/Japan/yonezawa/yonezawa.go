@@ -39,6 +39,9 @@ func StartDownload(pageUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 	for i, uri := range canvases.ImgUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

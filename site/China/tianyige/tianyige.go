@@ -51,6 +51,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		dt.SavePath = config.CreateDirectory(dt.Url, id)
 		log.Printf(" %d/%d volume, %d pages \n", vol.Sort, len(volumes), len(parts[vol.FascicleId]))
 		for i, record := range parts[vol.FascicleId] {
+			if config.SeqContinue(i) {
+				continue
+			}
 			uri, _, err := getImageById(record.ImageId, config.Conf.CookieFile)
 			if uri == "" || err != nil {
 				continue
@@ -139,6 +142,9 @@ func getImageRecord(imageId string, cookieFile string) (imageRecords []ImageReco
 func getCanvases(imageIds []string, cookieFile string) (canvases Canvases) {
 	fmt.Println()
 	for i, id := range imageIds {
+		if config.SeqContinue(i) {
+			continue
+		}
 		imgUrl, ocrUrl, err := getImageById(id, cookieFile)
 		if err != nil {
 			continue

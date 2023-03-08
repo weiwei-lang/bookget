@@ -42,6 +42,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 
 	ext := ".pdf"
 	for i, v := range pdfUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if v.Url == "" {
 			continue
 		}

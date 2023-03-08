@@ -37,6 +37,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		log.Printf("requested URL was not found.\n")
 	}
 	for i, uri := range canvases {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

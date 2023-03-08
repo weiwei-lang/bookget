@@ -29,6 +29,9 @@ func StartDownload(num int, uri, bookId string) {
 	log.Printf(" %d pages.\n", len(pages))
 
 	for i, imgUri := range pages {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if imgUri == "" {
 			continue
 		}

@@ -56,6 +56,9 @@ func DziDownload(pageUrl, bookId string, iiifUrls []string) {
 		"-H", "User-Agent:" + config.Conf.UserAgent,
 	}
 	for i, uri := range iiifUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}
@@ -72,6 +75,9 @@ func NormalDownload(pageUrl, bookId string, imgUrls []string) {
 		return
 	}
 	for i, uri := range imgUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

@@ -90,6 +90,9 @@ func NormalDownload(pageUrl, bookId string, imgUrls []string, jar *cookiejar.Jar
 		jar, err = cookiejar.New(nil)
 	}
 	for i, uri := range imgUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

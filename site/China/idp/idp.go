@@ -40,6 +40,9 @@ func StartDownload(dt *DownloadTask) (msg string, err error) {
 	config.CreateDirectory(dt.Url, dt.BookId)
 	ext := ".jpg"
 	for i, dUrl := range canvases.ImgUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if dUrl == "" {
 			continue
 		}

@@ -59,6 +59,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		}
 		dt.SavePath = config.CreateDirectory(dt.Url, id)
 		for i, uri := range canvases {
+			if config.SeqContinue(i) {
+				continue
+			}
 			if uri == "" {
 				continue
 			}

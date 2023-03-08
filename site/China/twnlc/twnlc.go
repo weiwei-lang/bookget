@@ -43,6 +43,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	//循环下载图片
 	ext := ".jpg"
 	for i, uri := range canvases.ImgUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}

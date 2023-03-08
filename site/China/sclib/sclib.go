@@ -93,6 +93,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		"-H", "User-Agent:" + config.Conf.UserAgent,
 	}
 	for i, val := range dziUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		inputUri := storePath + val
 		outfile := storePath + util.GenNumberSorted(i+1) + ext
 		if ret := util.StartProcess(inputUri, outfile, args); ret == true {

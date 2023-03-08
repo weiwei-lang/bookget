@@ -38,6 +38,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	}
 	storePath := destPath + string(os.PathSeparator)
 	for i, uri := range canvases.IiifUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		sortId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", sortId, uri)
 		outfile := storePath + sortId + config.Conf.FileExt

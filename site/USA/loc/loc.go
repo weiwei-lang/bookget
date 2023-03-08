@@ -35,6 +35,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	//cookie 处理
 	jar, _ := cookiejar.New(nil)
 	for i, dUrl := range imageUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if dUrl == "" {
 			continue
 		}

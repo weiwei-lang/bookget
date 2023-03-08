@@ -39,6 +39,9 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	size = len(imageUrls)
 	log.Printf(" %d pages.\n", size)
 	for i, uri := range imageUrls {
+		if config.SeqContinue(i) {
+			continue
+		}
 		if uri == "" {
 			continue
 		}
