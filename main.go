@@ -73,7 +73,8 @@ func taskForUrls() {
 	}
 	for domain, sUrls := range sortUrls {
 		wg.Add(1)
-		go func(id string, data []string) {
+		go func(waitGroup *sync.WaitGroup, id string, data []string) {
+			defer waitGroup.Done()
 			msg, err := router.FactoryRouter(id, data)
 			if err != nil {
 				fmt.Println(err)
@@ -82,7 +83,7 @@ func taskForUrls() {
 			if msg != nil {
 				fmt.Printf("%+v\n", msg)
 			}
-		}(domain, sUrls)
+		}(&wg, domain, sUrls)
 	}
 	wg.Wait()
 	log.Println("Download complete.")
