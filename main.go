@@ -10,7 +10,10 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 	ctx := context.Background()
@@ -20,35 +23,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	//单个URL
+	//終端運行：单个URL
 	if config.Conf.DUrl != "" {
 		ExecuteCommand(ctx, 1, config.Conf.DUrl)
-		log.Print("Download complete.\n")
+		log.Println("Download complete.")
 		return
 	}
-
-	//批量URLs
+	//終端運行：批量URLs
 	if config.Conf.UrlsFile != "" {
-		//加载配置文件
-		bs, err := os.ReadFile(config.Conf.UrlsFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		mUrls := strings.Split(string(bs), "\n")
-		iCount := 0
-		for i, sUrl := range mUrls {
-			if sUrl == "" {
-				continue
-			}
-			ExecuteCommand(ctx, i+1, sUrl)
-			iCount++
-		}
-		log.Print("Download complete.\n")
-		log.Printf("下载完成，共 %d 个任务，请到 %s 目录下查看。\n", iCount, config.Conf.SaveFolder)
+		taskForUrls()
 		return
 	}
-
+	//雙擊運行
 	iCount := 0
 	for {
 		reader := bufio.NewReader(os.Stdin)
@@ -62,8 +48,45 @@ func main() {
 		iCount++
 		ExecuteCommand(ctx, iCount, sUrl)
 	}
-	log.Print("Download complete.\n")
-	log.Printf("下载完成，共 %d 个任务，请到 %s 目录下查看。\n", iCount, config.Conf.SaveFolder)
+	log.Println("Download complete.")
+}
+
+func taskForUrls() {
+	//加载配置文件
+	bs, err := os.ReadFile(config.Conf.UrlsFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	mUrls := strings.Split(string(bs), "\n")
+	sortUrls := make(map[string][]string)
+	for _, sUrl := range mUrls {
+		sUrl = strings.Trim(sUrl, "\r\n")
+		if sUrl == "" || !strings.HasPrefix(sUrl, "http") {
+			continue
+		}
+		u, err := url.Parse(sUrl)
+		if err != nil {
+			continue
+		}
+		sortUrls[u.Host] = append(sortUrls[u.Host], sUrl)
+	}
+	for domain, sUrls := range sortUrls {
+		wg.Add(1)
+		go func(id string, data []string) {
+			msg, err := router.FactoryRouter(id, data)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			if msg != nil {
+				fmt.Printf("%+v\n", msg)
+			}
+		}(domain, sUrls)
+	}
+	wg.Wait()
+	log.Println("Download complete.")
+	return
 }
 
 func ExecuteCommand(ctx context.Context, i int, sUrl string) {
