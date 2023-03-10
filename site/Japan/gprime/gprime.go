@@ -81,12 +81,12 @@ func getCanvases(bookId string, jar *cookiejar.Jar) []string {
 		if err := json.Unmarshal(bs, &resImage); err != nil {
 			continue
 		}
-		if !resImage.IsNext || resImage.Size == 0 || resImage.Total < i {
-			break
-		}
 		for _, v := range resImage.ImagePath {
 			sUrl := fmt.Sprintf(urlTemplate, bookId, v)
 			canvases = append(canvases, sUrl)
+		}
+		if !resImage.IsNext || resImage.Size == 0 || resImage.Total < i {
+			break
 		}
 	}
 	return canvases
