@@ -2,7 +2,7 @@
 
 <a href="https://github.com/deweizhu/bookget/actions/workflows/go.yml"><img src="https://github.com/deweizhu/bookget/actions/workflows/go.yml/badge.svg" alt="Go build Status"></a>
 
-bookget 数字图书馆下载工具，目前支持约30-40个数字图书馆。    
+bookget 数字图书馆下载工具，目前支持约50+个数字图书馆。    
 初次见面，让我们花几分钟时间学习，阅读使用手册 [bookget Wiki](https://github.com/deweizhu/bookget/wiki)，这不是必须的，但可以为我们以后使用节约更多的时间。
 
 排名不分先后，按地区划分。
