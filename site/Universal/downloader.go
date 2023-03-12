@@ -29,6 +29,7 @@ func StartDownload(iTask int, taskUrl string) (msg string, err error) {
 		bookId = strconv.FormatUint(uint64(zhash.CRC32(taskUrl)), 10)
 	}
 	config.CreateDirectory(taskUrl, bookId)
+	jar, _ := cookiejar.New(nil)
 	for _, dUrl := range downloadUrls {
 		sortId := util.GenNumberSorted(startIndex)
 		startIndex++
@@ -45,6 +46,7 @@ func StartDownload(iTask int, taskUrl string) (msg string, err error) {
 			DestFile:    dest,
 			Concurrency: config.Conf.Threads,
 			CookieFile:  config.Conf.CookieFile,
+			CookieJar:   jar,
 			Headers: map[string]interface{}{
 				"User-Agent": config.Conf.UserAgent,
 			},

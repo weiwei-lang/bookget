@@ -145,7 +145,7 @@ func GetDestPath(sUrl, id, filename string) string {
 }
 
 func LetterNumberEscape(s string) string {
-	m := regexp.MustCompile(`([A-Za-z0-9-_]+)`).FindAllString(s, -1)
+	m := regexp.MustCompile(`([A-Za-z0-9-_.]+)`).FindAllString(s, -1)
 	if m != nil {
 		s = strings.Join(m, "")
 	}

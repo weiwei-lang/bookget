@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http/cookiejar"
 	"net/url"
 	"regexp"
 )
@@ -74,6 +75,7 @@ func NormalDownload(pageUrl, bookId string, imgUrls []string) {
 	if imgUrls == nil {
 		return
 	}
+	jar, _ := cookiejar.New(nil)
 	for i, uri := range imgUrls {
 		if config.SeqContinue(i) {
 			continue
@@ -91,6 +93,7 @@ func NormalDownload(pageUrl, bookId string, imgUrls []string) {
 			Overwrite:   false,
 			Concurrency: 1,
 			CookieFile:  config.Conf.CookieFile,
+			CookieJar:   jar,
 			Headers: map[string]interface{}{
 				"User-Agent": config.Conf.UserAgent,
 			},

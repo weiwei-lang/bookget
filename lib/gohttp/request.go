@@ -122,7 +122,9 @@ func (r *Request) Request(method, uri string, opts ...Options) (*Request, error)
 
 func (r *Request) do() (*Response, error) {
 	_resp, err := r.cli.Do(r.req)
-	defer _resp.Body.Close()
+	if _resp != nil {
+		defer _resp.Body.Close()
+	}
 	resp := &Response{
 		resp: _resp,
 		req:  r.req,

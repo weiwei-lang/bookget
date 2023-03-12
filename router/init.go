@@ -140,7 +140,7 @@ func FactoryRouter(siteID string, sUrl []string) (map[string]interface{}, error)
 		//}}} -----------------------------------------------------------------
 
 		//{{{---------------其它--------------------------------------------------
-		//036.國際敦煌項目
+		//國際敦煌項目
 		Router["idp.nlc.cn"] = new(IDP)
 		Router["idp.bl.uk"] = new(IDP)
 		Router["idp.orientalstudies.ru"] = new(IDP)
@@ -148,6 +148,10 @@ func FactoryRouter(siteID string, sUrl []string) (map[string]interface{}, error)
 		Router["idp.bbaw.de"] = new(IDP)
 		Router["idp.bnf.fr"] = new(IDP)
 		Router["idp.korea.ac.kr"] = new(IDP)
+
+		//[韩国]
+		Router["kyudb.snu.ac.kr"] = new(KyudbSnu)
+
 		//}}} -----------------------------------------------------------------
 		Router["iiif.io"] = new(NormalIIIF)
 		Router["bookget"] = new(NormalHttp)
