@@ -1,9 +1,9 @@
 package stanford
 
 import (
+	"bookget/app"
 	"bookget/lib/curl"
 	"bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"fmt"
 	"log"
 	"regexp"
@@ -31,7 +31,11 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	size := len(bookUrls)
 	for i := 0; i < size; i++ {
 		log.Printf(" %d/%d volume.\n", i+1, size)
-		iiif.StartDownload(bookUrls[i], fmt.Sprintf("%s_Volume%d", bookId, i+1))
+		//iiif.StartDownload(bookUrls[i], fmt.Sprintf("%s_Volume%d", bookId, i+1))
+		id := util.GenNumberSorted(i + 1)
+		bookId = fmt.Sprintf("%s_vol.%s", bookId, id)
+		var iiif app.IIIF
+		iiif.InitWithId(iTask, bookUrls[i], bookId)
 	}
 	return
 }

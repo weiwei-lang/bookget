@@ -46,6 +46,7 @@ func main() {
 			break
 		}
 		iCount++
+		sUrl = strings.TrimSpace(sUrl)
 		ExecuteCommand(ctx, iCount, sUrl)
 	}
 	log.Println("Download complete.")
@@ -61,7 +62,7 @@ func taskForUrls() {
 	mUrls := strings.Split(string(bs), "\n")
 	sortUrls := make(map[string][]string)
 	for _, sUrl := range mUrls {
-		sUrl = strings.Trim(sUrl, "\r\n")
+		sUrl = strings.TrimSpace(sUrl)
 		if sUrl == "" || !strings.HasPrefix(sUrl, "http") {
 			continue
 		}

@@ -1,10 +1,10 @@
 package princeton
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/gohttp"
 	"bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"log"
 	"net/http/cookiejar"
 	"net/url"
@@ -31,7 +31,9 @@ func InitDpul(iTask int, taskUrl string) (msg string, err error) {
 	for i, manifestUrl := range mfUrls {
 		tId := util.GenNumberSorted(i + 1)
 		log.Printf("Get %s  %s\n", tId, manifestUrl)
-		iiif.StartDownload(manifestUrl, bookId)
+		//iiif.StartDownload(manifestUrl, bookId)
+		var iiif app.IIIF
+		iiif.InitWithId(iTask, manifestUrl, bookId)
 	}
 	return "", err
 }

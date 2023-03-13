@@ -1,9 +1,9 @@
 package kokusho
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/gohttp"
-	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,7 +30,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 	if manifestUrl == "" {
 		return "requested URL was not found.", err
 	}
-	iiif.StartDownload(manifestUrl, dt.BookId)
+	//iiif.StartDownload(manifestUrl, dt.BookId)
+	var iiif app.IIIF
+	iiif.InitWithId(dt.Index, manifestUrl, dt.BookId)
 	return "", nil
 }
 

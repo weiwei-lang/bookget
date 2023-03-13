@@ -24,7 +24,6 @@ bookget 数字图书馆下载工具，目前支持约50+个数字图书馆。
 1. [中国][中华寻根网（国图）](http://ouroots.nlc.cn/genealogyCulture.html)
 1. [中国][国家哲学社会科学文献中心-古籍](https://www.ncpssd.org/Literature/ancientbooklist?nav=5)
 1. [中国][云南中医药大学古籍数字图书馆](http://guji.ynutcm.edu.cn/Yngj/Home/Index)
-1. [中国][山东中医药大学古籍数字图书馆](https://gjsztsg.sdutcm.edu.cn/)
 
 ### 欧美数字图书馆：
 1. [美国][哈佛大学图书馆](https://hollis.harvard.edu/) [或哈佛燕京图书馆藏](https://gj.library.sh.cn/org/harvard)
@@ -61,8 +60,8 @@ bookget 数字图书馆下载工具，目前支持约50+个数字图书馆。
 
 ### 其它数字图书馆：
 1. [世界][國際敦煌項目](http://idp.nlc.cn/)
-1. [韩国][国家图书馆](https://www.dlibrary.go.kr/) [或开放数据](https://lod.nl.go.kr/)
-    (注：请使用v0.2.6版。新版不再支持。)
+1. [韩国][国家图书馆](https://www.dlibrary.go.kr/) [或开放数据](https://lod.nl.go.kr/) (注：请使用v0.2.6版。新版不再支持。)
+1. [韩国][奎章閣韓國語研究所](https://kyudb.snu.ac.kr/)
 
    
 鸣谢：

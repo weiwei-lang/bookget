@@ -1,9 +1,9 @@
 package oxacuk
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"fmt"
 	"log"
 	"regexp"
@@ -25,6 +25,8 @@ func StartDownload(iTask int, taskUrl, bookId string) {
 	log.Printf("Get %s  %s\n", name, taskUrl)
 
 	manifestUrl := fmt.Sprintf("https://iiif.bodleian.ox.ac.uk/iiif/manifest/%s.json", bookId)
-	iiif.StartDownload(manifestUrl, bookId)
+	//iiif.StartDownload(manifestUrl, bookId)
+	var iiif app.IIIF
+	iiif.InitWithId(iTask, manifestUrl, bookId)
 	return
 }
