@@ -1,10 +1,10 @@
 package berlin
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/gohttp"
-	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
+	"bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -38,9 +38,9 @@ func StartDownload(pageUrl, bookId string) {
 
 	config.CreateDirectory(pageUrl, bookId)
 	if config.Conf.UseDziRs {
-		iiif.DziDownload(pageUrl, bookId, canvases.IiifUrls)
+		app.DziDownload(pageUrl, bookId, canvases.IiifUrls)
 	} else {
-		iiif.NormalDownload(pageUrl, bookId, canvases.ImgUrls)
+		app.NormalDownload(pageUrl, bookId, canvases.ImgUrls, nil)
 	}
 	return
 }

@@ -1,10 +1,10 @@
 package niiac
 
 import (
+	"bookget/app"
 	"bookget/config"
 	curl "bookget/lib/curl"
 	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -35,9 +35,9 @@ func StartDownload(iTask int, pageUrl, bookId string) {
 
 	config.CreateDirectory(pageUrl, bookId)
 	if config.Conf.UseDziRs {
-		iiif.DziDownload(pageUrl, bookId, iiifUrls)
+		app.DziDownload(pageUrl, bookId, iiifUrls)
 	} else {
-		iiif.NormalDownload(pageUrl, bookId, imageUrls)
+		app.NormalDownload(pageUrl, bookId, imageUrls, nil)
 	}
 }
 

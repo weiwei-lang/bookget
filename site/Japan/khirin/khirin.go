@@ -1,10 +1,10 @@
 package khirin
 
 import (
+	"bookget/app"
 	"bookget/config"
 	curl "bookget/lib/curl"
 	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -74,9 +74,9 @@ func startDownload(pageUrl, bookId string) {
 	log.Printf(" %d pages.\n", canvases.Size)
 	config.CreateDirectory(pageUrl, bookId)
 	if config.Conf.UseDziRs {
-		iiif.DziDownload(pageUrl, bookId, canvases.IiifUrls)
+		app.DziDownload(pageUrl, bookId, canvases.IiifUrls)
 	} else {
-		iiif.NormalDownload(pageUrl, bookId, canvases.ImgUrls)
+		app.NormalDownload(pageUrl, bookId, canvases.ImgUrls, nil)
 	}
 }
 

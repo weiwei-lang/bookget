@@ -1,10 +1,10 @@
 package emuseum
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/curl"
 	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -35,9 +35,9 @@ func StartDownload(num int, pageUrl, bookId string) {
 
 	config.CreateDirectory(pageUrl, bookId)
 	if config.Conf.UseDziRs {
-		iiif.DziDownload(pageUrl, bookId, iiifInfo)
+		app.DziDownload(pageUrl, bookId, iiifInfo)
 	} else {
-		iiif.NormalDownload(pageUrl, bookId, pages)
+		app.NormalDownload(pageUrl, bookId, pages, nil)
 	}
 }
 

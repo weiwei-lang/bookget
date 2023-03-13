@@ -1,10 +1,10 @@
 package npmtw
 
 import (
+	"bookget/app"
 	"bookget/config"
-	curl "bookget/lib/curl"
-	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
+	"bookget/lib/curl"
+	"bookget/lib/util"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -31,10 +31,11 @@ func StartDownload(iTask int, pageUrl, bookId string) {
 	}
 	log.Printf(" %d pages.\n", canvases.Size)
 	config.CreateDirectory(pageUrl, bookId)
+
 	if config.Conf.UseDziRs {
-		iiif.DziDownload(pageUrl, bookId, canvases.IiifUrls)
+		app.DziDownload(pageUrl, bookId, canvases.IiifUrls)
 	} else {
-		iiif.NormalDownload(pageUrl, bookId, canvases.ImgUrls)
+		app.NormalDownload(pageUrl, bookId, canvases.ImgUrls, nil)
 	}
 }
 

@@ -1,11 +1,11 @@
 package keio
 
 import (
+	"bookget/app"
 	"bookget/config"
 	curl "bookget/lib/curl"
 	"bookget/lib/gohttp"
 	util "bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -55,9 +55,9 @@ func Download(dt *DownloadTask) (msg string, err error) {
 		volPath := fmt.Sprintf("%s_volume%d", dt.BookId, k+1)
 		config.CreateDirectory(vol, volPath)
 		if config.Conf.UseDziRs {
-			iiif.DziDownload(vol, volPath, canvases.IiifUrls)
+			app.DziDownload(vol, volPath, canvases.IiifUrls)
 		} else {
-			iiif.NormalDownload(vol, volPath, canvases.ImgUrls)
+			app.NormalDownload(vol, volPath, canvases.ImgUrls, nil)
 		}
 	}
 	return "", err

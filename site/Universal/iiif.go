@@ -1,10 +1,10 @@
 package Universal
 
 import (
+	"bookget/app"
 	"bookget/config"
 	"bookget/lib/gohttp"
 	"bookget/lib/util"
-	"bookget/site/Universal/iiif"
 	"errors"
 	"fmt"
 	"log"
@@ -31,6 +31,8 @@ func AutoDetectManifest(iTask int, taskUrl string) (msg string, err error) {
 	text := string(bs)
 	contentType := resp.GetHeaderLine("content-type")
 	if strings.Contains(text, "://iiif.io/api/") && strings.HasPrefix(contentType, "application/json") {
+		//iiif.Init(iTask, taskUrl)
+		var iiif app.IIIF
 		iiif.Init(iTask, taskUrl)
 		return
 	}
@@ -41,6 +43,8 @@ func AutoDetectManifest(iTask int, taskUrl string) (msg string, err error) {
 		err = errors.New(msg)
 		return
 	}
+	//iiif.Init(iTask, manifestUrl)
+	var iiif app.IIIF
 	iiif.Init(iTask, manifestUrl)
 	return
 }
