@@ -39,7 +39,6 @@ func NormalDownload(pageUrl, bookId string, imgUrls []string, jar *cookiejar.Jar
 		jar, err = cookiejar.New(nil)
 	}
 	threads := config.Conf.Threads
-	//https://emuseum.nich.go.jp/iiif/?IIIF=/100168009000-001.tif/full/7000,/0/default.jpg
 	if strings.Contains(imgUrls[0], "/full/") || strings.HasSuffix(imgUrls[0], "/0/default.jpg") {
 		threads = 1
 	}
