@@ -24,7 +24,7 @@ type IIIF struct {
 
 // ResponseManifest  by view-source:https://iiif.lib.harvard.edu/manifests/drs:53262215
 type ResponseManifest struct {
-	Label     string `json:"label"`
+	Label     interface{} `json:"label"`
 	Sequences []struct {
 		Canvases []struct {
 			Id     string `json:"@id"`
