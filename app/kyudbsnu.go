@@ -18,6 +18,7 @@ import (
 type KyudbSnu struct {
 	dt     *DownloadTask
 	itemId string
+	entry  string
 }
 
 func (k KyudbSnu) Init(iTask int, sUrl string) (msg string, err error) {
@@ -30,7 +31,26 @@ func (k KyudbSnu) Init(iTask int, sUrl string) (msg string, err error) {
 		return "requested URL was not found.", err
 	}
 	k.dt.Jar, _ = cookiejar.New(nil)
+	k.entry = k.getEntryPage(sUrl)
+	k.itemId = k.getItemId(sUrl)
 	return k.download()
+}
+
+func (k KyudbSnu) getEntryPage(sUrl string) (entry string) {
+	if strings.Contains(sUrl, "book/view.do") {
+		entry = "bookview"
+	} else if strings.Contains(sUrl, "rendererImg.do") {
+		entry = "renderer"
+	}
+	return entry
+}
+
+func (k KyudbSnu) getItemId(sUrl string) (itemId string) {
+	m := regexp.MustCompile(`item_cd=([A-z0-9_-]+)`).FindStringSubmatch(sUrl)
+	if m != nil {
+		itemId = m[1]
+	}
+	return itemId
 }
 
 func (k KyudbSnu) getBookId(sUrl string) (bookId string) {
@@ -48,11 +68,13 @@ func (k KyudbSnu) download() (msg string, err error) {
 	if err != nil || bs == nil {
 		return "requested URL was not found.", err
 	}
-	match := regexp.MustCompile(`item_cd=([A-z0-9_-]+)`).FindSubmatch(bs)
-	if match == nil {
-		return "requested URL was not found.", err
+	if k.itemId == "" && k.entry == "renderer" {
+		match := regexp.MustCompile(`item_cd=([A-z0-9_-]+)`).FindSubmatch(bs)
+		if match == nil {
+			return "requested URL was not found.", err
+		}
+		k.itemId = string(match[1])
 	}
-	k.itemId = string(match[1])
 	respVolume, err := k.getVolumes(k.dt.Url, k.dt.Jar)
 	if err != nil {
 		return "getVolumes", err
