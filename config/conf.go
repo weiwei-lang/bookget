@@ -123,7 +123,10 @@ func printVersion() {
 }
 
 func CreateDirectory(sUrl, id string) string {
-	u, _ := url.Parse(sUrl)
+	u, err := url.Parse(sUrl)
+	if err != nil {
+		return ""
+	}
 	domain := strings.Replace(u.Host, ":", "", 1)
 	sPath := Conf.SaveFolder + string(os.PathSeparator) + domain
 	if id != "" {

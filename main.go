@@ -60,10 +60,9 @@ func taskForUrls() {
 		return
 	}
 	mUrls := strings.Split(string(bs), "\n")
-
 	q := QueueNew(int(config.Conf.Threads))
-	for _, sUrl := range mUrls {
-		sUrl = strings.TrimSpace(sUrl)
+	for _, v := range mUrls {
+		sUrl := strings.TrimSpace(strings.Trim(v, "\r"))
 		if sUrl == "" || !strings.HasPrefix(sUrl, "http") {
 			continue
 		}
