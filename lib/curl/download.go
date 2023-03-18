@@ -5,6 +5,7 @@ import (
 	"bookget/lib/util"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -70,6 +71,9 @@ func execDownload(uri, dest, method string, data []byte, header map[string]strin
 	rsp, err := client.Do(req)
 	if err != nil {
 		return
+	}
+	if rsp.StatusCode != 200 {
+		return 0, errors.New(rsp.Status)
 	}
 	defer func(d *Download) {
 		_ = rsp.Body.Close()

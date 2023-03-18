@@ -60,7 +60,8 @@ func taskForUrls() {
 		return
 	}
 	mUrls := strings.Split(string(bs), "\n")
-	sortUrls := make(map[string][]string)
+
+	q := QueueNew(int(config.Conf.Threads))
 	for _, sUrl := range mUrls {
 		sUrl = strings.TrimSpace(sUrl)
 		if sUrl == "" || !strings.HasPrefix(sUrl, "http") {
@@ -70,13 +71,10 @@ func taskForUrls() {
 		if err != nil {
 			continue
 		}
-		sortUrls[u.Host] = append(sortUrls[u.Host], sUrl)
-	}
-	for domain, sUrls := range sortUrls {
 		wg.Add(1)
-		go func(waitGroup *sync.WaitGroup, id string, data []string) {
-			defer waitGroup.Done()
-			msg, err := router.FactoryRouter(id, data)
+		q.Go(func() {
+			defer wg.Done()
+			msg, err := router.FactoryRouter(u.Host, []string{sUrl})
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -84,7 +82,7 @@ func taskForUrls() {
 			if msg != nil {
 				fmt.Printf("%+v\n", msg)
 			}
-		}(&wg, domain, sUrls)
+		})
 	}
 	wg.Wait()
 	log.Println("Download complete.")
