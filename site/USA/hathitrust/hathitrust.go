@@ -59,7 +59,7 @@ func StartDownload(num int, uri, bookId string) {
 		format = "tiff"
 	}
 	for i := 0; i < size; i++ {
-		if config.PageRange(i, size) {
+		if !config.PageRange(i, size) {
 			continue
 		}
 		for true {
