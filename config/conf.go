@@ -16,6 +16,8 @@ type Input struct {
 	UrlsFile   string //输入urls.txt
 	CookieFile string //输入cookie.txt
 	Seq        string //页面范围 4:434
+	SeqStart   int    //页面范围 4:434
+	SeqEnd     int    //页面范围 4:434
 	Volume     int    //多册，只下第N册
 	Speed      uint   //限速
 	SaveFolder string //下载文件存放目录，默认为当前文件夹下 Downloads 目录下
@@ -100,6 +102,7 @@ func Init(ctx context.Context) bool {
 	if Conf.Speed > 60 {
 		Conf.Speed = 60
 	}
+	initSeq()
 	//保存目录处理
 	_ = os.Mkdir(Conf.SaveFolder, os.ModePerm)
 

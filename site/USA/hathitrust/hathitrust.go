@@ -59,13 +59,13 @@ func StartDownload(num int, uri, bookId string) {
 		format = "tiff"
 	}
 	for i := 0; i < size; i++ {
-		if config.SeqContinue(i) {
+		if config.PageRange(i, size) {
 			continue
 		}
 		for true {
 			sortId := util.GenNumberSorted(i + 1)
 			imgurl := fmt.Sprintf("https://babel.hathitrust.org/cgi/imgsrv/image?id=%s&attachment=1&size=full&format=image/%s&seq=%d", bookId, format, i+1)
-			log.Printf("Get %s  %s\n", sortId, imgurl)
+			log.Printf("Get %d/%d  %s\n", i+1, size, imgurl)
 
 			fileName := sortId + ext
 			dest := config.GetDestPath(uri, bookId, fileName)

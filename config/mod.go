@@ -1,21 +1,28 @@
 package config
 
-import (
-	"strconv"
-	"strings"
-)
-
 // SeqContinue    false = 最小值 <= 当前页码 <=  最大值
 func SeqContinue(index int) bool {
-	if Conf.Seq == "" || !strings.Contains(Conf.Seq, ":") {
+	if Conf.SeqStart <= 0 {
 		return false
 	}
-	m := strings.Split(Conf.Seq, ":")
-	min, _ := strconv.Atoi(m[0])
-	max, _ := strconv.Atoi(m[1])
-	index++
-	if index < min || (max > 0 && index >= max) {
-		return true
+	if Conf.SeqEnd > 0 && index+1 >= Conf.SeqStart && index < Conf.SeqEnd {
+		return false
+	} else if index+1 >= Conf.SeqStart {
+		return false
 	}
-	return false
+	return true
+}
+
+func PageRange(index, size int) bool {
+	if Conf.SeqStart <= 0 {
+		return false
+	}
+	if Conf.SeqEnd < 0 && (index-size >= Conf.SeqEnd) {
+		return true
+	} else if Conf.SeqEnd > 0 && index+1 >= Conf.SeqStart && index < Conf.SeqEnd {
+		return false
+	} else if index+1 >= Conf.SeqStart {
+		return false
+	}
+	return true
 }
