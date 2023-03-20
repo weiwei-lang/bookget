@@ -30,7 +30,8 @@ func AutoDetectManifest(iTask int, taskUrl string) (msg string, err error) {
 	bs, _ := resp.GetBody()
 	text := string(bs)
 	contentType := resp.GetHeaderLine("content-type")
-	if strings.Contains(text, "://iiif.io/api/") && strings.HasPrefix(contentType, "application/json") {
+	if strings.Contains(text, "://iiif.io/api/") && (strings.HasPrefix(contentType, "application/json") ||
+		strings.HasPrefix(contentType, "application/ld+json")) {
 		//iiif.Init(iTask, taskUrl)
 		var iiif app.IIIF
 		iiif.Init(iTask, taskUrl)

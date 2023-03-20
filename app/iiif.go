@@ -87,6 +87,10 @@ func (f IIIF) getBookId(sUrl string) (bookId string) {
 	if m != nil {
 		bookId = m[1]
 	}
+	m = regexp.MustCompile(`/([^/]+)`).FindStringSubmatch(sUrl)
+	if m != nil {
+		bookId = m[1]
+	}
 	return bookId
 }
 
