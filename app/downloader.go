@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -96,4 +97,12 @@ func DziDownload(pageUrl, bookId string, iiifUrls []string) {
 		dest := config.GetDestPath(pageUrl, bookId, filename)
 		util.StartProcess(uri, dest, args)
 	}
+}
+
+func FileExist(path string) bool {
+	fi, err := os.Stat(path)
+	if err == nil && fi.Size() > 0 {
+		return true
+	}
+	return false
 }

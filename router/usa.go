@@ -1,8 +1,8 @@
 package router
 
 import (
+	"bookget/app"
 	"bookget/site/USA/harvard"
-	"bookget/site/USA/hathitrust"
 	"bookget/site/USA/loc"
 	"bookget/site/USA/princeton"
 )
@@ -22,6 +22,7 @@ type Hathitrust struct {
 
 func (p Hathitrust) getRouterInit(sUrl []string) (map[string]interface{}, error) {
 	for i, s := range sUrl {
+		var hathitrust app.Hathitrust
 		hathitrust.Init(i+1, s)
 	}
 	return nil, nil
