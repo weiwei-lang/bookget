@@ -1,8 +1,8 @@
 package router
 
 import (
+	"bookget/app"
 	"bookget/site/China/bjdpm"
-	"bookget/site/China/cuhk"
 	"bookget/site/China/gzlib"
 	"bookget/site/China/jslib"
 	"bookget/site/China/luoyang"
@@ -61,6 +61,7 @@ type CuHk struct{}
 
 func (p CuHk) getRouterInit(sUrl []string) (map[string]interface{}, error) {
 	for i, s := range sUrl {
+		var cuhk app.Cuhk
 		cuhk.Init(i+1, s)
 	}
 	return nil, nil

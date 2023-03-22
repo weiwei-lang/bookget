@@ -28,6 +28,7 @@ type DownloadTask struct {
 	SavePath  string
 	BookId    string
 	Title     string
+	VolumeId  string
 	Param     map[string]interface{} //备用参数
 	Jar       *cookiejar.Jar
 }
