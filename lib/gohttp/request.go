@@ -130,14 +130,16 @@ func (r *Request) do() (*Response, error) {
 		req:  r.req,
 		err:  err,
 	}
-	if err != nil || _resp.StatusCode != http.StatusOK {
+	if err != nil {
 		if r.opts.Debug {
 			// print response err
 			fmt.Println(err)
 		}
 		return resp, err
 	}
-
+	if _resp.StatusCode != http.StatusOK {
+		return resp, errors.New(fmt.Sprintf("ErrCode:%d, %s", resp.GetStatusCode(), resp.GetReasonPhrase()))
+	}
 	if r.opts.DestFile != "" {
 		dl := &Download{
 			startedAt: time.Now(),

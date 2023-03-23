@@ -99,7 +99,7 @@ func (r Cuhk) do(imgUrls []string) (msg string, err error) {
 			continue
 		}
 		sortId := util.GenNumberSorted(i + 1)
-		filename := sortId + ".jp2"
+		filename := sortId + config.Conf.FileExt
 		dest := config.GetDestPath(r.dt.Url, r.dt.VolumeId, filename)
 		if FileExist(dest) {
 			continue
@@ -169,11 +169,11 @@ func (r Cuhk) getCanvases(sUrl string, jar *cookiejar.Jar) (canvases []string, e
 	}
 	for _, page := range resp.ImagePage {
 		var imgUrl string
-		template := "https://repository.lib.cuhk.edu.hk/islandora/object/%s/datastream/JP2"
-		imgUrl = fmt.Sprintf(template, page.Pid)
-		//if config.Conf.FileExt == ".jpg" {
-		//	imgUrl = fmt.Sprintf("https://repository.lib.cuhk.edu.hk/%s/full/full/0/default.jpg", page.Identifier)
-		//}
+		if config.Conf.FileExt == ".jpg" {
+			imgUrl = fmt.Sprintf("https://repository.lib.cuhk.edu.hk/iiif/2/%s/full/full/0/default.jpg", page.Identifier)
+		} else {
+			imgUrl = fmt.Sprintf("https://repository.lib.cuhk.edu.hk/islandora/object/%s/datastream/JP2", page.Pid)
+		}
 		canvases = append(canvases, imgUrl)
 	}
 	return canvases, err
