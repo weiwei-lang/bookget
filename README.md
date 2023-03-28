@@ -1,7 +1,10 @@
 # bookget
 
 bookget 数字图书馆下载工具，目前支持约50+个数字图书馆。    
-初次见面，让我们花几分钟时间学习，阅读使用手册 [bookget Wiki]，这不是必须的，但可以为我们以后使用节约更多的时间。
+使用手册 https://github.com/deweizhu/bookget/wiki
+
+
+
 
 
 
